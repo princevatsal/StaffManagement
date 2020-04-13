@@ -1,19 +1,13 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {Text, View, StyleSheet, ActivityIndicator} from 'react-native';
-import firebase from 'firebase'
-const Loading = ({navigation}) => {
-  useEffect(() => {
-    firebase.auth().onAuthStateChanged(user => {
-      navigation.navigate(user ? 'AppStack' : 'AuthStack');
-    });
-  }, []);
 
-  return (
-    <View style={styles.container}>
-      <ActivityIndicator size={'large'} />
-    </View>
-  );
-};
+
+const Loading = () => (
+  <View style={styles.container}>
+    <ActivityIndicator size={'large'} />
+    <Text>Loading...</Text>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {

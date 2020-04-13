@@ -1,31 +1,25 @@
 import firebase from 'firebase';
 
+import firebaseConfig from '../config';
+firebase.initializeApp(firebaseConfig)
 
-
-const Fire = () => {
-  const checkAuthenticate = () => {
-    if (firebase.auth.currentUser) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const signIn = (email, password) => {
+class Fire {
+  signIn = (email, password) => {
     firebase
+      .auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => console.log('Successfully Signed In'))
       .catch(err => console.log(err));
   };
 
-  const signUp = (email, password) => {
+  signUp = (email, password) => {
     firebase
+      .auth()
       .createUserWithEmailAndPassword(email, password)
       .then(() => console.log('Successfully Created User'))
       .catch(err => console.log(err));
   };
+}
 
-  return {checkAuthenticate, signIn, signUp};
-};
-
-export default Fire();
+Fire.share = new Fire();
+export default Fire;
