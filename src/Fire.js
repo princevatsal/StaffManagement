@@ -1,9 +1,10 @@
 import firebase from 'firebase';
 
-import firebaseConfig from '../config';
-firebase.initializeApp(firebaseConfig)
-
 class Fire {
+  initializeFirebase = config => {
+    firebase.initializeApp(config);
+  };
+
   signIn = (email, password) => {
     firebase
       .auth()
@@ -19,7 +20,15 @@ class Fire {
       .then(() => console.log('Successfully Created User'))
       .catch(err => console.log(err));
   };
+
+  signOutUser = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => console.log('Used Signed Out'))
+      .catch(err => console.log(err));
+  };
 }
 
-Fire.share = new Fire();
+Fire.shared = new Fire();
 export default Fire;

@@ -1,10 +1,9 @@
 import React from 'react';
 import {Text, View, StyleSheet, ActivityIndicator} from 'react-native';
 
-
 const Loading = () => (
   <View style={styles.container}>
-    <ActivityIndicator size={'large'} />
+    <ActivityIndicator size="large" />
     <Text>Loading...</Text>
   </View>
 );
