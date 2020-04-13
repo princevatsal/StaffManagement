@@ -1,9 +1,6 @@
 import firebase from 'firebase';
 
-import firebaseConfig from '../config';
 
-firebase.initializeApp(firebaseConfig);
-console.log('Firebase Initialized');
 
 const Fire = () => {
   const checkAuthenticate = () => {

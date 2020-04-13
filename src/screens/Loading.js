@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {Text, View, StyleSheet, ActivityIndicator} from 'react-native';
-
+import firebase from 'firebase'
 const Loading = ({navigation}) => {
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
-      navigation.navigate(user ? 'App' : 'Auth');
+      navigation.navigate(user ? 'AppStack' : 'AuthStack');
     });
   }, []);
 
