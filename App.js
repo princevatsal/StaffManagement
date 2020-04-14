@@ -3,6 +3,7 @@ import React from 'react';
 // Set up firebase
 import firebaseConfig from './config';
 import Fire from './src/Fire';
+
 Fire.shared.initializeFirebase(firebaseConfig);
 
 // App Navigator

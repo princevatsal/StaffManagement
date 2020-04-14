@@ -20,7 +20,10 @@ import {
 
 import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
-
+import {set} from 'react-native-reanimated';
+import {auth} from 'firebase';
+import Fire from '../Fire';
+var fire = Fire.shared;
 const {width, height} = Dimensions.get('screen');
 
 const DismissKeyboard = ({children}) => (
@@ -28,159 +31,114 @@ const DismissKeyboard = ({children}) => (
     {children}
   </TouchableWithoutFeedback>
 );
-const createUser = (email, password, confpass) => {
-  console.log('creating user', password, confpass);
-  if (password != confpass) {
-    console.log('pass not match');
-    Alert('title', 'Paaswors not match ');
+const validateEmail = email => {
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+};
+const createUserr = authDetails => {
+  if (!validateEmail(authDetails.email)) {
+    alert('Email is not valid');
     return null;
   }
+  if (authDetails.password != authDetails.confpass) {
+    alert('Password not match ');
+    return null;
+  }
+  if (authDetails.password.length < 8) {
+    alert('Password should be atleast 8 digit long');
+    return null;
+  }
+  fire
+    .signUp(authDetails.email, authDetails.password)
+    .then(() => console.log('user created sucessfully'))
+    .catch(e => alert(e));
+  console.log('signedIn Sucessfully');
+};
+
+const AuthDetails = ({authDetails, setAuthDetails}) => {
+  return (
+    <>
+      <Block>
+        <Block width={width * 0.8} style={{marginBottom: 5}}>
+          <Input
+            placeholder="Email"
+            value={authDetails.email}
+            onChangeText={e => setAuthDetails({...authDetails, email: e})}
+            style={styles.inputs}
+            iconContent={
+              <Icon
+                size={16}
+                color="#ADB5BD"
+                name="email"
+                family="NowExtra"
+                style={styles.inputIcons}
+              />
+            }
+          />
+        </Block>
+        <Block width={width * 0.8} style={{marginBottom: 5}}>
+          <Input
+            placeholder="Password"
+            value={authDetails.password}
+            secureTextEntry={true}
+            onChangeText={e => setAuthDetails({...authDetails, password: e})}
+            style={styles.inputs}
+            iconContent={
+              <Icon
+                size={16}
+                color="#ADB5BD"
+                name="lock"
+                family="NowExtra"
+                style={styles.inputIcons}
+              />
+            }
+          />
+        </Block>
+        <Block width={width * 0.8} style={{marginBottom: 5}}>
+          <Input
+            placeholder="Confirm Password"
+            value={authDetails.confpass}
+            onChangeText={e => setAuthDetails({...authDetails, confpass: e})}
+            secureTextEntry={true}
+            style={styles.inputs}
+            iconContent={
+              <Icon
+                size={16}
+                color="#ADB5BD"
+                name="lock"
+                family="NowExtra"
+                style={styles.inputIcons}
+              />
+            }
+          />
+        </Block>
+      </Block>
+      <Block center>
+        <Button
+          color="primary"
+          round
+          style={styles.createButton}
+          onPress={() => {
+            createUserr(authDetails);
+          }}>
+          <Text
+            style={{fontFamily: 'montserrat-bold'}}
+            size={14}
+            color={nowTheme.COLORS.WHITE}>
+            Get Started
+          </Text>
+        </Button>
+      </Block>
+    </>
+  );
 };
 const Signup = () => {
-  [email, setemail] = useState('');
-  [password, setpassword] = useState('');
-  [confpass, setconfpass] = useState('');
-  [name, setname] = useState('');
-  [driving, setdriving] = useState('');
-  [userCreated, setuserCreated] = useState(false);
-  const Fields2 = () => {
-    return (
-      <>
-        <Block>
-          <Block width={width * 0.8} style={{marginBottom: 5}}>
-            <Input
-              placeholder="Name"
-              value={name}
-              onChange={e => setname(e)}
-              style={styles.inputs}
-              iconContent={
-                <Icon
-                  size={16}
-                  color="#ADB5BD"
-                  name="account-circle"
-                  family="NowExtra"
-                  style={styles.inputIcons}
-                />
-              }
-            />
-          </Block>
-          <Block width={width * 0.8}>
-            <Input
-              placeholder="Driving Licence No"
-              value={driving}
-              keyboardType={'numeric'}
-              onChange={e => setdriving(e)}
-              style={styles.inputs}
-              iconContent={
-                <Icon
-                  size={23}
-                  color="#ADB5BD"
-                  name="lock"
-                  family="NowExtra"
-                  style={styles.inputIcons}
-                />
-              }
-            />
-          </Block>
-        </Block>
-        <Block center>
-          <Button
-            color="primary"
-            round
-            style={styles.createButton}
-            onPress={() => {
-              // createUser(email, password, confpass);
-            }}>
-            <Text
-              style={{fontFamily: 'montserrat-bold'}}
-              size={14}
-              color={nowTheme.COLORS.WHITE}>
-              Get Started
-            </Text>
-          </Button>
-        </Block>
-      </>
-    );
-  };
+  [authDetails, setAuthDetails] = useState({
+    email: '',
+    password: '',
+    confpassword: '',
+  });
 
-  const Fields = () => {
-    return (
-      <>
-        <Block>
-          <Block width={width * 0.8} style={{marginBottom: 5}}>
-            <Input
-              placeholder="Email"
-              value={email}
-              onChange={e => setemail(e)}
-              style={styles.inputs}
-              iconContent={
-                <Icon
-                  size={16}
-                  color="#ADB5BD"
-                  name="email"
-                  family="NowExtra"
-                  style={styles.inputIcons}
-                />
-              }
-            />
-          </Block>
-          <Block width={width * 0.8} style={{marginBottom: 5}}>
-            <Input
-              placeholder="Password"
-              value={password}
-              secureTextEntry={true}
-              onChange={e => setpassword(e)}
-              style={styles.inputs}
-              iconContent={
-                <Icon
-                  size={16}
-                  color="#ADB5BD"
-                  name="lock"
-                  family="NowExtra"
-                  style={styles.inputIcons}
-                />
-              }
-            />
-          </Block>
-          <Block width={width * 0.8} style={{marginBottom: 5}}>
-            <Input
-              placeholder="Confirm Password"
-              value={confpass}
-              onChange={e => setconfpass(e)}
-              secureTextEntry={true}
-              style={styles.inputs}
-              iconContent={
-                <Icon
-                  size={16}
-                  color="#ADB5BD"
-                  name="lock"
-                  family="NowExtra"
-                  style={styles.inputIcons}
-                />
-              }
-            />
-          </Block>
-        </Block>
-        <Block center>
-          <Button
-            color="primary"
-            round
-            style={styles.createButton}
-            onPress={() => {
-              // console.log(email);
-              // createUser(email, password, confpass);
-            }}>
-            <Text
-              style={{fontFamily: 'montserrat-bold'}}
-              size={14}
-              color={nowTheme.COLORS.WHITE}>
-              Get Started
-            </Text>
-          </Button>
-        </Block>
-      </>
-    );
-  };
   return (
     <DismissKeyboard>
       <Block flex middle>
@@ -260,7 +218,10 @@ const Signup = () => {
                 <Block flex={1} middle space="between">
                   <Block center flex={0.9}>
                     <Block flex space="between">
-                      {userCreated ? <Fields2 /> : <Fields />}
+                      <AuthDetails
+                        authDetails={authDetails}
+                        setAuthDetails={setAuthDetails}
+                      />
                     </Block>
                   </Block>
                 </Block>
