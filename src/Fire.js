@@ -20,7 +20,7 @@ class Fire {
       firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(() => resolve())
+        .then(data => resolve(data))
         .catch(err => reject(err));
     });
   };

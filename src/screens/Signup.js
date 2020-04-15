@@ -20,10 +20,8 @@ import {
 
 import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
-import {set} from 'react-native-reanimated';
-import {auth} from 'firebase';
 import Fire from '../Fire';
-var fire = Fire.shared;
+import {connect} from 'react-redux';
 const {width, height} = Dimensions.get('screen');
 
 const DismissKeyboard = ({children}) => (
@@ -48,9 +46,9 @@ const createUserr = authDetails => {
     alert('Password should be atleast 8 digit long');
     return null;
   }
-  fire
-    .signUp(authDetails.email, authDetails.password)
-    .then(() => console.log('user created sucessfully'))
+  Fire.shared
+    .signUp(authDetailRFs.email, authDetails.password)
+    .then(user => console.log(user))
     .catch(e => alert(e));
   console.log('signedIn Sucessfully');
 };
@@ -312,4 +310,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Signup;
+const mapStateToProps = state => ({
+  user: state.user,
+  UI: state.UI,
+});
+
+export default connect(
+  mapStateToProps,
+  {signupUser},
+)(Signup);
