@@ -10,10 +10,10 @@ const App = createDrawerNavigator();
 
 const AppStack = () => (
   <App.Navigator>
+    <App.Screen name="Profile" component={Profile} />
     <App.Screen name="UserInfo" component={UserInfo} />
     <App.Screen name="Home" component={Home} />
     <App.Screen name="Schedule" component={Schedule} />
-    <App.Screen name="Profile" component={Profile} />
   </App.Navigator>
 );
 
