@@ -1,4 +1,6 @@
 import firebase from 'firebase';
+const admin = require('firebase-admin');
+const functions = require('firebase-functions');
 class Fire {
   initializeFirebase = config => {
     firebase.initializeApp(config);
@@ -11,7 +13,7 @@ class Fire {
       firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
-        .then(user => resolve(user))
+        .then(() => resolve())
         .catch(err => reject(err));
     });
   };
@@ -21,7 +23,7 @@ class Fire {
       firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(user => resolve(user))
+        .then(() => resolve())
         .catch(err => reject(err));
     });
   };
@@ -29,9 +31,7 @@ class Fire {
     firebase
       .auth()
       .signOut()
-      .then(() => {
-        console.log('Used Signed Out');
-      })
+      .then(() => console.log('Used Signed Out'))
       .catch(err => console.log(err));
   };
 }

@@ -5,8 +5,6 @@ import {Block, Text} from 'galio-framework';
 import {useState, useEffect} from 'react';
 import React from 'react';
 import {Icon} from 'react-native-elements';
-import Fire from '../Fire';
-fire = Fire.shared;
 const {width, height} = Dimensions.get('screen');
 const UserInfo = ({userDetails, setUserDetails}) => {
   [userDetails, setUserDetails] = useState({

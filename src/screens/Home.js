@@ -1,9 +1,15 @@
 import React, {useEffect} from 'react';
+import {connect} from 'react-redux';
 import {Text, View, StyleSheet, Button, Dimensions} from 'react-native';
 const {width, height} = Dimensions.get('screen');
 import {Icon} from 'react-native-elements';
-const Home = ({navigation}) => {
-  useEffect(() => {});
+import Fire from '../fire';
+fire = Fire.shared;
+const Home = ({navigation, user}) => {
+  useEffect(() => {
+    // fire.signOutUser();
+    console.log('app state ', user);
+  });
   return (
     <View style={styles.container}>
       <View
@@ -47,4 +53,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+const mapStateToProps = state => ({
+  user: state.user,
+});
+
+export default connect(
+  mapStateToProps,
+  {},
+)(Home);

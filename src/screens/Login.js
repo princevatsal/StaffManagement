@@ -17,10 +17,11 @@ import {
 import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Fire from '../Fire';
-fire = Fire.shared;
+import Fire from '../fire';
+const fire = Fire.shared;
 const {width, height} = Dimensions.get('screen');
-
+import {connect} from 'react-redux';
+import {updateUserUid} from '../redux/actions/userActions';
 const DismissKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     {children}
@@ -30,8 +31,7 @@ const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
-signInUser = (email, password) => {
-  console.log('signing ', email, password);
+signInUser = (email, password, user, updateUserUid) => {
   if (!validateEmail(email)) {
     alert('Email is not valid');
     return null;
@@ -42,12 +42,14 @@ signInUser = (email, password) => {
   }
   fire
     .signIn(email, password)
-    .then(() => console.log('login sucess'))
+    .then(data => {
+      updateUserUid(data.user.uid);
+    })
     .catch(e => {
       alert(e);
     });
 };
-const Login = ({navigation}) => {
+const Login = ({navigation, user, updateUserUid}) => {
   [email, setEmail] = useState('');
   [password, setPassword] = useState('');
   return (
@@ -165,7 +167,6 @@ const Login = ({navigation}) => {
                       </Block>
                       <Text
                         onPress={() => {
-                          console.log('clicked');
                           navigation.push('Signup');
                         }}
                         center
@@ -183,7 +184,7 @@ const Login = ({navigation}) => {
                           round
                           style={styles.createButton}
                           onPress={() => {
-                            signInUser(email, password);
+                            signInUser(email, password, user, updateUserUid);
                           }}>
                           <Text
                             style={{fontFamily: 'montserrat-bold'}}
@@ -282,5 +283,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
 });
-
-export default Login;
+mapToProps = state => ({
+  user: state.user,
+});
+export default connect(
+  mapToProps,
+  {updateUserUid},
+)(Login);

@@ -17,14 +17,14 @@ import {
   Button as GaButton,
   theme,
 } from 'galio-framework';
-
+import {updateUserUid} from '../redux/actions/userActions';
 import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
-import {set} from 'react-native-reanimated';
-import {auth} from 'firebase';
-import Fire from '../Fire';
-var fire = Fire.shared;
+import Fire from '../fire';
+import {connect} from 'react-redux';
+
 const {width, height} = Dimensions.get('screen');
+const fire = Fire.shared;
 
 const DismissKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -35,7 +35,7 @@ const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
-const createUserr = authDetails => {
+const createUserr = (authDetails, user, updateUserUid) => {
   if (!validateEmail(authDetails.email)) {
     alert('Email is not valid');
     return null;
@@ -50,12 +50,13 @@ const createUserr = authDetails => {
   }
   fire
     .signUp(authDetails.email, authDetails.password)
-    .then(() => console.log('user created sucessfully'))
+    .then(data => {
+      updateUserUid(data.user.uid);
+    })
     .catch(e => alert(e));
-  console.log('signedIn Sucessfully');
 };
 
-const AuthDetails = ({authDetails, setAuthDetails}) => {
+const AuthDetails = ({authDetails, setAuthDetails, user, updateUserUid}) => {
   return (
     <>
       <Block>
@@ -119,7 +120,7 @@ const AuthDetails = ({authDetails, setAuthDetails}) => {
           round
           style={styles.createButton}
           onPress={() => {
-            createUserr(authDetails);
+            createUserr(authDetails, user, updateUserUid);
           }}>
           <Text
             style={{fontFamily: 'montserrat-bold'}}
@@ -132,7 +133,7 @@ const AuthDetails = ({authDetails, setAuthDetails}) => {
     </>
   );
 };
-const Signup = () => {
+const Signup = ({user, updateUserUid}) => {
   [authDetails, setAuthDetails] = useState({
     email: '',
     password: '',
@@ -221,6 +222,8 @@ const Signup = () => {
                       <AuthDetails
                         authDetails={authDetails}
                         setAuthDetails={setAuthDetails}
+                        user={user}
+                        updateUserUid={updateUserUid}
                       />
                     </Block>
                   </Block>
@@ -311,5 +314,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
 });
-
-export default Signup;
+mapToProps = state => ({
+  user: state.user,
+});
+export default connect(
+  mapToProps,
+  {updateUserUid},
+)(Signup);
