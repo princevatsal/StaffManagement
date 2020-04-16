@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "852955534775",
+    "firebase_url": "https://staff-management-753e4.firebaseio.com",
+    "project_id": "staff-management-753e4",
+    "storage_bucket": "staff-management-753e4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852955534775:android:6b7e09329badf4dd158432",
+        "android_client_info": {
+          "package_name": "com.staffmanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "852955534775-umv0c442ecfqjkd48hpfblf7828hialq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.staffmanagement",
+            "certificate_hash": "94c882c54b0ed2d5934e3dc748bce5bb4d07e6d8"
+          }
+        },
+        {
+          "client_id": "852955534775-4endgesl83pob92e10soodjbn5rvpkos.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJktoxCPAfRm13op64dU1u40QvgnSi2qw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "852955534775-4endgesl83pob92e10soodjbn5rvpkos.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

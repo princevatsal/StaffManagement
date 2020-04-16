@@ -17,7 +17,7 @@ import {
 import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Fire from '../fire';
+import Fire from '../Fire';
 const fire = Fire.shared;
 const {width, height} = Dimensions.get('screen');
 import {connect} from 'react-redux';

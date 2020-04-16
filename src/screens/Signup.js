@@ -20,7 +20,7 @@ import {
 import {updateUserUid} from '../redux/actions/userActions';
 import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
-import Fire from '../fire';
+import Fire from '../Fire';
 import {connect} from 'react-redux';
 
 const {width, height} = Dimensions.get('screen');

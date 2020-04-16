@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 const {width, height} = Dimensions.get('screen');
 import {Icon} from 'react-native-elements';
-import Fire from '../fire';
+import Fire from '../Fire';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import Modal from 'react-native-modal';
 fire = Fire.shared;
