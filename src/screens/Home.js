@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 import {
   Text,
@@ -12,8 +12,13 @@ import {
 const {width, height} = Dimensions.get('screen');
 import {Icon} from 'react-native-elements';
 import Fire from '../fire';
+import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
+import Modal from 'react-native-modal';
 fire = Fire.shared;
+
 const Home = ({navigation, user}) => {
+  [model, setmodel] = useState(false);
+
   useEffect(() => {
     // fire.signOutUser();
     console.log('app state ', user);
@@ -80,7 +85,13 @@ const Home = ({navigation, user}) => {
           <View style={{flexDirection: 'row'}}>
             <Image
               source={require('../assets/imgs/bulb2.png')}
-              style={{height: 30, width: 30, marginLeft: 10, marginRight: 11}}
+              style={{
+                height: 30,
+                width: 30,
+                marginLeft: 10,
+                marginRight: 11,
+                backgroundColor: 'white',
+              }}
             />
             <Text style={{fontSize: 19, color: '#999', marginTop: 4}}>
               Today
@@ -95,16 +106,21 @@ const Home = ({navigation, user}) => {
             }}
           />
           <View style={{flexDirection: 'row'}}>
-            <Image
-              source={require('../assets/imgs/calander2.png')}
-              style={{
-                height: 28,
-                width: 28,
-                marginTop: 3,
-                marginLeft: 10,
-                marginRight: 11,
-              }}
-            />
+            <TouchableOpacity
+              onPress={() => {
+                setmodel(!model);
+              }}>
+              <Image
+                source={require('../assets/imgs/calander2.png')}
+                style={{
+                  height: 28,
+                  width: 28,
+                  marginTop: 3,
+                  marginLeft: 10,
+                  marginRight: 11,
+                }}
+              />
+            </TouchableOpacity>
             <Text style={{fontSize: 19, color: '#999', marginTop: 4}}>
               Choose Day
             </Text>
@@ -138,6 +154,17 @@ const Home = ({navigation, user}) => {
           </View>
         </View>
       </View>
+
+      <Modal isVisible={model}>
+        <View style={{flex: 1}}>
+          <Calendar
+            onDayPress={day => {
+              console.log('selected day', day);
+              setmodel(!model);
+            }}
+          />
+        </View>
+      </Modal>
     </View>
   );
 };
