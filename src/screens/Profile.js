@@ -1,4 +1,4 @@
-import React, {useDebugValue} from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -6,19 +6,22 @@ import {
   Image,
   ImageBackground,
   Platform,
+  AsyncStorage,
 } from 'react-native';
 import {Block, Text, theme, Button as GaButton} from 'galio-framework';
-import {useState} from 'react';
+import {connect} from 'react-redux';
 import {Button} from '../components';
 import {Images, nowTheme} from '../constants';
-import {HeaderHeight} from '../constants/utils';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import Fire from '../Fire';
+import {updateUserUid} from '../redux/actions/userActions';
 const {width, height} = Dimensions.get('screen');
 const ProfilePricture =
   'https://www.biggalyoga.com/wp-content/uploads/2018/07/profilecircle-768x814.png';
 
 const thumbMeasure = (width - 48 - 32) / 2.5;
 
-const Profile = () => {
+const Profile = ({navigation, updateUserUid}) => {
   [userDetails, setuserDetails] = useState({
     profileurl: ProfilePricture,
     name: 'Priyansh Vatsal',
@@ -38,6 +41,19 @@ const Profile = () => {
           style={styles.profileContainer}
           imageStyle={styles.profileBackground}>
           <Block flex style={styles.profileCard}>
+            <TouchableOpacity
+              style={{
+                margin: 20,
+              }}
+              onPress={() => {
+                console.log('pressed');
+                navigation.toggleDrawer();
+              }}>
+              <Image
+                source={require('../assets/imgs/menu2.png')}
+                style={{width: 45, height: 45}}
+              />
+            </TouchableOpacity>
             <Block
               style={{
                 position: 'absolute',
@@ -144,17 +160,27 @@ const Profile = () => {
                 top: height * 0.6 - 22,
                 zIndex: 99,
               }}>
-              <Button
-                style={{
-                  width: 114,
-                  height: 44,
-                  marginHorizontal: 5,
-                  elevation: 0,
-                }}
-                textStyle={{fontSize: 16}}
-                round>
-                Follow
-              </Button>
+              <TouchableOpacity
+                onPress={() => {
+                  Fire.shared
+                    .signOutUser()
+                    .then(() => {
+                      console.log('user signed out sucessfully');
+                    })
+                    .catch(err => alert(err.message));
+                }}>
+                <Button
+                  style={{
+                    width: 114,
+                    height: 44,
+                    marginHorizontal: 5,
+                    elevation: 0,
+                  }}
+                  textStyle={{fontSize: 16}}
+                  round>
+                  SignOut
+                </Button>
+              </TouchableOpacity>
               <GaButton
                 round
                 onlyIcon
@@ -266,4 +292,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Profile;
+export default connect(
+  null,
+  {updateUserUid},
+)(Profile);

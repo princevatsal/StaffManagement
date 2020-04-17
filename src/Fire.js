@@ -26,13 +26,15 @@ class Fire {
     });
   };
   signOutUser = () => {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        console.log('Used Signed Out');
-      })
-      .catch(err => console.log(err));
+    return new Promise((resolve, reject) => {
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          resolve();
+        })
+        .catch(err => reject(err));
+    });
   };
 }
 
