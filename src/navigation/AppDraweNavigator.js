@@ -5,9 +5,11 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import Home from '../screens/Home';
 import Profile from '../screens/Profile';
 import Admin from '../screens/Admin';
+
+// App Drawer Navigator
 const App = createDrawerNavigator();
 
-const AppStack = () => (
+const AppDrawerNavigator = () => (
   <App.Navigator>
     <App.Screen name="Home" component={Home} />
     <App.Screen name="Admin" component={Admin} />
@@ -15,4 +17,4 @@ const AppStack = () => (
   </App.Navigator>
 );
 
-export default AppStack;
+export default AppDrawerNavigator;

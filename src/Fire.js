@@ -1,11 +1,15 @@
 import firebase from 'firebase';
+import firestore from '@react-native-firebase/firestore';
+
 class Fire {
   initializeFirebase = config => {
     firebase.initializeApp(config);
   };
+
   initializeFirestore = () => {
     admin.initializeApp(functions.config().firebase);
   };
+
   signIn = (email, password) => {
     return new Promise((resolve, reject) => {
       firebase
@@ -25,6 +29,7 @@ class Fire {
         .catch(err => reject(err));
     });
   };
+
   signOutUser = () => {
     return new Promise((resolve, reject) => {
       firebase
@@ -33,6 +38,17 @@ class Fire {
         .then(() => {
           resolve();
         })
+        .catch(err => reject(err));
+    });
+  };
+
+  getUserData = uid => {
+    return new Promise((resolve, reject) => {
+      firestore
+        .collection('users')
+        .doc(uid)
+        .get()
+        .then(res => resolve(res.data()))
         .catch(err => reject(err));
     });
   };
