@@ -20,8 +20,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Fire from '../Fire';
 const fire = Fire.shared;
 const {width, height} = Dimensions.get('screen');
-import {connect} from 'react-redux';
-import {updateUserUid} from '../redux/actions/userActions';
 const DismissKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     {children}
@@ -31,7 +29,7 @@ const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
-signInUser = (email, password, user, updateUserUid) => {
+signInUser = (email, password) => {
   if (!validateEmail(email)) {
     alert('Email is not valid');
     return null;
@@ -43,13 +41,13 @@ signInUser = (email, password, user, updateUserUid) => {
   fire
     .signIn(email, password)
     .then(data => {
-      updateUserUid(data.user.uid);
+      console.log('user signed');
     })
     .catch(e => {
       alert(e);
     });
 };
-const Login = ({navigation, user, updateUserUid}) => {
+const Login = ({navigation}) => {
   [email, setEmail] = useState('');
   [password, setPassword] = useState('');
   return (
@@ -184,7 +182,7 @@ const Login = ({navigation, user, updateUserUid}) => {
                           round
                           style={styles.createButton}
                           onPress={() => {
-                            signInUser(email, password, user, updateUserUid);
+                            signInUser(email, password);
                           }}>
                           <Text
                             style={{fontFamily: 'montserrat-bold'}}
@@ -283,10 +281,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
 });
-mapToProps = state => ({
-  user: state.user,
-});
-export default connect(
-  mapToProps,
-  {updateUserUid},
-)(Login);
+export default Login;

@@ -5,9 +5,16 @@ import firebaseConfig from './config';
 import Fire from './src/Fire';
 Fire.shared.initializeFirebase(firebaseConfig);
 
-// App Navigator
-import Loading from './src/screens/Loading';
+// User Context Provider
+import {UserProvider} from './src/context/userContext';
 
-const App = () => <Loading />;
+// App Navigator
+import AppNavigator from './src/navigation/AppNavigator';
+
+const App = () => (
+  <UserProvider>
+    <AppNavigator />
+  </UserProvider>
+);
 
 export default App;

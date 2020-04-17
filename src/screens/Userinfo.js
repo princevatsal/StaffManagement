@@ -2,18 +2,29 @@ import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
 import {View, Dimensions, StyleSheet} from 'react-native';
 import {Block, Text} from 'galio-framework';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import React from 'react';
 import {Icon} from 'react-native-elements';
+import Fire from '../Fire';
 const {width, height} = Dimensions.get('screen');
-const UserInfo = ({userDetails, setUserDetails}) => {
-  [userDetails, setUserDetails] = useState({
+
+//globalUser
+import {UserContext} from '../context/userContext';
+
+const UserInfo = ({navigation}) => {
+  // const globalUser = useContext(UserContext);
+  const {
+    unsetGlobalUser,
+    user: {uid},
+  } = useContext(UserContext);
+  const [userDetails, setUserDetails] = useState({
     name: '',
     driving: '',
   });
   useEffect(() => {
     // fire.signOutUser();
-  }, []);
+    console.log('globalUid:-', uid);
+  }, [uid]);
   return (
     <>
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -61,7 +72,25 @@ const UserInfo = ({userDetails, setUserDetails}) => {
             round
             style={styles.createButton}
             onPress={() => {
-              // createUser(email, password, confpass);
+              console.log(userDetails.name, userDetails.driving);
+              Fire.shared
+                .writeUserData(uid, {
+                  credentials: {
+                    name: userDetails.name,
+                    drivingLicenceNo: userDetails.driving,
+                  },
+                })
+                .then(() => {
+                  console.log('user record submitted sucessfully');
+                  Fire.shared.signOutUser().then(() => {
+                    alert('Sucessfully Registered . Please Login Again');
+                    unsetGlobalUser();
+                    console.log('user unset');
+                  });
+
+                  navigation.navigate('Loading');
+                })
+                .catch(e => alert(e));
             }}>
             <Text
               style={{fontFamily: 'montserrat-bold'}}

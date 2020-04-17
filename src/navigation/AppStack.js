@@ -9,7 +9,7 @@ import Admin from '../screens/Admin';
 // App Drawer Navigator
 const App = createDrawerNavigator();
 
-const AppDrawerNavigator = () => (
+const AppStack = () => (
   <App.Navigator>
     <App.Screen name="Home" component={Home} />
     <App.Screen name="Admin" component={Admin} />
@@ -17,4 +17,4 @@ const AppDrawerNavigator = () => (
   </App.Navigator>
 );
 
-export default AppDrawerNavigator;
+export default AppStack;

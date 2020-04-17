@@ -1,6 +1,8 @@
 import firebase from 'firebase';
 import firestore from '@react-native-firebase/firestore';
 
+//using database
+const db = firestore();
 class Fire {
   initializeFirebase = config => {
     firebase.initializeApp(config);
@@ -43,13 +45,25 @@ class Fire {
   };
 
   getUserData = uid => {
+    console.log(uid);
     return new Promise((resolve, reject) => {
-      firestore
-        .collection('users')
+      db.collection('users')
         .doc(uid)
         .get()
-        .then(res => resolve(res.data()))
+        .then(res => {
+          resolve(res.data());
+        })
         .catch(err => reject(err));
+    });
+  };
+  writeUserData = (uid, data) => {
+    return new Promise((resolve, reject) => {
+      db.collection('users')
+        .doc(uid)
+        .set({
+          ...data,
+        })
+        .then(() => resolve());
     });
   };
 }

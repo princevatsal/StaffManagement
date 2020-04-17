@@ -4,24 +4,14 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert,
 } from 'react-native';
 import {Icon} from 'react-native-elements';
-import {
-  Block,
-  Checkbox,
-  Text,
-  Button as GaButton,
-  theme,
-} from 'galio-framework';
-import {updateUserUid} from '../redux/actions/userActions';
+import {Block, Text, Button as GaButton, theme} from 'galio-framework';
 import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
 import Fire from '../Fire';
-import {connect} from 'react-redux';
 
 const {width, height} = Dimensions.get('screen');
 const fire = Fire.shared;
@@ -35,111 +25,33 @@ const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
-const createUserr = (authDetails, user, updateUserUid) => {
-  if (!validateEmail(authDetails.email)) {
-    alert('Email is not valid');
-    return null;
-  }
-  if (authDetails.password != authDetails.confpass) {
-    alert('Password not match ');
-    return null;
-  }
-  if (authDetails.password.length < 8) {
-    alert('Password should be atleast 8 digit long');
-    return null;
-  }
-  fire
-    .signUp(authDetails.email, authDetails.password)
-    .then(data => {
-      updateUserUid(data.user.uid);
-    })
-    .catch(e => alert(e));
-};
 
-const AuthDetails = ({authDetails, setAuthDetails, user, updateUserUid}) => {
-  return (
-    <>
-      <Block>
-        <Block width={width * 0.8} style={{marginBottom: 5}}>
-          <Input
-            placeholder="Email"
-            value={authDetails.email}
-            onChangeText={e => setAuthDetails({...authDetails, email: e})}
-            style={styles.inputs}
-            iconContent={
-              <Icon
-                size={16}
-                color="#ADB5BD"
-                name="email"
-                family="NowExtra"
-                style={styles.inputIcons}
-              />
-            }
-          />
-        </Block>
-        <Block width={width * 0.8} style={{marginBottom: 5}}>
-          <Input
-            placeholder="Password"
-            value={authDetails.password}
-            secureTextEntry={true}
-            onChangeText={e => setAuthDetails({...authDetails, password: e})}
-            style={styles.inputs}
-            iconContent={
-              <Icon
-                size={16}
-                color="#ADB5BD"
-                name="lock"
-                family="NowExtra"
-                style={styles.inputIcons}
-              />
-            }
-          />
-        </Block>
-        <Block width={width * 0.8} style={{marginBottom: 5}}>
-          <Input
-            placeholder="Confirm Password"
-            value={authDetails.confpass}
-            onChangeText={e => setAuthDetails({...authDetails, confpass: e})}
-            secureTextEntry={true}
-            style={styles.inputs}
-            iconContent={
-              <Icon
-                size={16}
-                color="#ADB5BD"
-                name="lock"
-                family="NowExtra"
-                style={styles.inputIcons}
-              />
-            }
-          />
-        </Block>
-      </Block>
-      <Block center>
-        <Button
-          color="primary"
-          round
-          style={styles.createButton}
-          onPress={() => {
-            createUserr(authDetails, user, updateUserUid);
-          }}>
-          <Text
-            style={{fontFamily: 'montserrat-bold'}}
-            size={14}
-            color={nowTheme.COLORS.WHITE}>
-            Get Started
-          </Text>
-        </Button>
-      </Block>
-    </>
-  );
-};
-const Signup = ({user, updateUserUid}) => {
+const Signup = () => {
   [authDetails, setAuthDetails] = useState({
     email: '',
     password: '',
     confpassword: '',
   });
-
+  const handleSubmit = () => {
+    if (!validateEmail(authDetails.email)) {
+      alert('Email is not valid');
+      return null;
+    }
+    if (authDetails.password != authDetails.confpass) {
+      alert('Password not match ');
+      return null;
+    }
+    if (authDetails.password.length < 8) {
+      alert('Password should be atleast 8 digit long');
+      return null;
+    }
+    fire
+      .signUp(authDetails.email, authDetails.password)
+      .then(data => {
+        console.log('user created');
+      })
+      .catch(e => alert(e));
+  };
   return (
     <DismissKeyboard>
       <Block flex middle>
@@ -219,12 +131,81 @@ const Signup = ({user, updateUserUid}) => {
                 <Block flex={1} middle space="between">
                   <Block center flex={0.9}>
                     <Block flex space="between">
-                      <AuthDetails
-                        authDetails={authDetails}
-                        setAuthDetails={setAuthDetails}
-                        user={user}
-                        updateUserUid={updateUserUid}
-                      />
+                      <Block>
+                        <Block width={width * 0.8} style={{marginBottom: 5}}>
+                          <Input
+                            placeholder="Email"
+                            value={authDetails.email}
+                            onChangeText={e =>
+                              setAuthDetails({...authDetails, email: e})
+                            }
+                            style={styles.inputs}
+                            iconContent={
+                              <Icon
+                                size={16}
+                                color="#ADB5BD"
+                                name="email"
+                                family="NowExtra"
+                                style={styles.inputIcons}
+                              />
+                            }
+                          />
+                        </Block>
+                        <Block width={width * 0.8} style={{marginBottom: 5}}>
+                          <Input
+                            placeholder="Password"
+                            value={authDetails.password}
+                            secureTextEntry={true}
+                            onChangeText={e =>
+                              setAuthDetails({...authDetails, password: e})
+                            }
+                            style={styles.inputs}
+                            iconContent={
+                              <Icon
+                                size={16}
+                                color="#ADB5BD"
+                                name="lock"
+                                family="NowExtra"
+                                style={styles.inputIcons}
+                              />
+                            }
+                          />
+                        </Block>
+                        <Block width={width * 0.8} style={{marginBottom: 5}}>
+                          <Input
+                            placeholder="Confirm Password"
+                            value={authDetails.confpass}
+                            onChangeText={e =>
+                              setAuthDetails({...authDetails, confpass: e})
+                            }
+                            secureTextEntry={true}
+                            style={styles.inputs}
+                            iconContent={
+                              <Icon
+                                size={16}
+                                color="#ADB5BD"
+                                name="lock"
+                                family="NowExtra"
+                                style={styles.inputIcons}
+                              />
+                            }
+                          />
+                        </Block>
+                      </Block>
+                      <Block center>
+                        <Button
+                          color="primary"
+                          round
+                          style={styles.createButton}
+                          onPress={handleSubmit}>
+                          <Text
+                            style={{fontFamily: 'montserrat-bold'}}
+                            size={14}
+                            color={nowTheme.COLORS.WHITE}>
+                            SignUp
+                          </Text>
+                        </Button>
+                      </Block>
                     </Block>
                   </Block>
                 </Block>
@@ -314,10 +295,5 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
 });
-mapToProps = state => ({
-  user: state.user,
-});
-export default connect(
-  mapToProps,
-  {updateUserUid},
-)(Signup);
+
+export default Signup;

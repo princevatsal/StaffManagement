@@ -5,23 +5,19 @@ import {
   ScrollView,
   Image,
   ImageBackground,
-  Platform,
-  AsyncStorage,
 } from 'react-native';
 import {Block, Text, theme, Button as GaButton} from 'galio-framework';
-import {connect} from 'react-redux';
 import {Button} from '../components';
 import {Images, nowTheme} from '../constants';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Fire from '../Fire';
-import {updateUserUid} from '../redux/actions/userActions';
 const {width, height} = Dimensions.get('screen');
 const ProfilePricture =
   'https://www.biggalyoga.com/wp-content/uploads/2018/07/profilecircle-768x814.png';
 
 const thumbMeasure = (width - 48 - 32) / 2.5;
 
-const Profile = ({navigation, updateUserUid}) => {
+const Profile = ({navigation}) => {
   [userDetails, setuserDetails] = useState({
     profileurl: ProfilePricture,
     name: 'Priyansh Vatsal',
@@ -292,7 +288,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect(
-  null,
-  {updateUserUid},
-)(Profile);
+export default Profile;

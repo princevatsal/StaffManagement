@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {connect} from 'react-redux';
 import {
   Text,
   View,
@@ -10,18 +9,17 @@ import {
   Image,
 } from 'react-native';
 const {width, height} = Dimensions.get('screen');
-import {Icon} from 'react-native-elements';
 import Fire from '../Fire';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import Modal from 'react-native-modal';
+
 fire = Fire.shared;
 
-const Home = ({navigation, user}) => {
+const Home = ({navigation}) => {
   [model, setmodel] = useState(false);
 
   useEffect(() => {
     // fire.signOutUser();
-    console.log('app state ', user);
   });
   return (
     <View style={styles.container}>
@@ -207,11 +205,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = state => ({
-  user: state.user,
-});
-
-export default connect(
-  mapStateToProps,
-  {},
-)(Home);
+export default Home;
