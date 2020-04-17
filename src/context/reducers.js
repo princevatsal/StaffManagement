@@ -1,9 +1,9 @@
-import {SET_USER, SET_UID, UNSET_USER} from './types';
+import {SET_USER, SET_UID, UNSET_USER, CHANGE_AUTHENTICATED} from './types';
 
 const setGlobalUser = (user, state) => {
   return {
     ...state,
-    user,
+    credentials: user.credentials,
   };
 };
 
@@ -25,6 +25,11 @@ export const userReducer = (state, action) => {
     case UNSET_USER:
       return action.payload;
 
+    case CHANGE_AUTHENTICATED:
+      return {
+        ...state,
+        authenticated: !state.authenticated,
+      };
     default:
       return state;
   }

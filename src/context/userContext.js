@@ -1,5 +1,5 @@
 import React, {createContext, useReducer} from 'react';
-import {SET_USER, SET_UID, UNSET_USER} from './types';
+import {SET_USER, SET_UID, UNSET_USER, CHANGE_AUTHENTICATED} from './types';
 
 // Global User Context
 export const UserContext = createContext();
@@ -29,9 +29,19 @@ export const UserProvider = ({children}) => {
     dispatch({type: UNSET_USER, payload: initialState});
   };
 
+  const switchAuthenticated = () => {
+    dispatch({type: CHANGE_AUTHENTICATED});
+  };
+
   return (
     <UserContext.Provider
-      value={{user: state, setGlobalUid, setGlobalUser, unsetGlobalUser}}>
+      value={{
+        user: state,
+        setGlobalUid,
+        setGlobalUser,
+        unsetGlobalUser,
+        switchAuthenticated,
+      }}>
       {children}
     </UserContext.Provider>
   );

@@ -9,7 +9,11 @@ import Fire from '../Fire';
 import {UserContext} from '../context/userContext';
 
 const Loading = ({navigation}) => {
-  const {setGlobalUid, setGlobalUser} = useContext(UserContext);
+  const {
+    setGlobalUid,
+    setGlobalUser,
+    user: {authenticated, uid},
+  } = useContext(UserContext);
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
@@ -17,30 +21,35 @@ const Loading = ({navigation}) => {
         // Set User Id to Global
         setGlobalUid(user.uid);
 
-        // FIND NAME OF USER
-        Fire.shared
-          .getUserData(user.uid)
-          .then(userData => {
-            console.log(userData);
-            if (!userData) {
-              navigation.navigate('Auth', {screen: 'UserInfo', uid: user.uid});
-              return null;
-            }
-            if (userData.isAdmin) {
-              navigation.navigate('App', {screen: 'Admin'});
-            } else if (userData.credentials.name) {
-              setGlobalUser(userData);
-              navigation.navigate('App', {screen: 'Home'});
-            } else {
-              navigation.navigate('Auth', {screen: 'UserInfo'});
-            }
-          })
-          .catch(err => console.log(err)); // TODO : MAKE CHANGES
+        handleNavigation(user.uid);
       } else {
         navigation.navigate('Auth');
       }
     });
-  }, []);
+    if (authenticated) handleNavigation(uid);
+  }, [authenticated]);
+
+  const handleNavigation = uid => {
+    // FIND NAME OF USER
+    Fire.shared
+      .getUserData(uid)
+      .then(userData => {
+        console.log(userData);
+        if (!userData) {
+          navigation.navigate('Auth', {screen: 'UserInfo', uid});
+          return null;
+        }
+        if (userData.isAdmin) {
+          navigation.navigate('App', {screen: 'Admin'});
+        } else if (userData.credentials.name) {
+          setGlobalUser(userData);
+          navigation.navigate('App', {screen: 'Home'});
+        } else {
+          navigation.navigate('Auth', {screen: 'UserInfo'});
+        }
+      })
+      .catch(err => console.log(err)); // TODO : MAKE CHANGES
+  };
 
   return (
     <View style={styles.container}>

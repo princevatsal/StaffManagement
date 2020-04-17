@@ -14,17 +14,13 @@ import {UserContext} from '../context/userContext';
 const UserInfo = ({navigation}) => {
   // const globalUser = useContext(UserContext);
   const {
-    unsetGlobalUser,
+    switchAuthenticated,
     user: {uid},
   } = useContext(UserContext);
   const [userDetails, setUserDetails] = useState({
     name: '',
     driving: '',
   });
-  useEffect(() => {
-    // fire.signOutUser();
-    console.log('globalUid:-', uid);
-  }, [uid]);
   return (
     <>
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -81,13 +77,12 @@ const UserInfo = ({navigation}) => {
                   },
                 })
                 .then(() => {
-                  console.log('user record submitted sucessfully');
-                  Fire.shared.signOutUser().then(() => {
-                    alert('Sucessfully Registered . Please Login Again');
-                    unsetGlobalUser();
-                    console.log('user unset');
-                  });
-
+                  // Fire.shared.signOutUser().then(() => {
+                  //   alert('Sucessfully Registered . Please Login Again');
+                  //   unsetGlobalUser();
+                  //   console.log('user unset');
+                  // });
+                  switchAuthenticated();
                   navigation.navigate('Loading');
                 })
                 .catch(e => alert(e));
