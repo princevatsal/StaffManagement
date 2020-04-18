@@ -1,10 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 
 // Screens
 import Home from '../screens/Home';
 import Profile from '../screens/Profile';
-import Admin from '../screens/Admin';
 
 // App Drawer Navigator
 const App = createDrawerNavigator();
@@ -12,7 +11,6 @@ const App = createDrawerNavigator();
 const AppStack = () => (
   <App.Navigator>
     <App.Screen name="Home" component={Home} />
-    <App.Screen name="Admin" component={Admin} />
     <App.Screen name="Profile" component={Profile} />
   </App.Navigator>
 );

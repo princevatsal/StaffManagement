@@ -3,7 +3,8 @@ import {SET_USER, SET_UID, UNSET_USER, CHANGE_AUTHENTICATED} from './types';
 const setGlobalUser = (user, state) => {
   return {
     ...state,
-    credentials: user.credentials,
+    // credentials: user.credentials,
+    ...user,
   };
 };
 

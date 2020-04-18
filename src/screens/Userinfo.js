@@ -75,6 +75,7 @@ const UserInfo = ({navigation}) => {
                     name: userDetails.name,
                     drivingLicenceNo: userDetails.driving,
                   },
+                  isAdmin: false,
                 })
                 .then(() => {
                   // Fire.shared.signOutUser().then(() => {

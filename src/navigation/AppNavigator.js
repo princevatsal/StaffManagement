@@ -7,7 +7,7 @@ import AuthStack from './AuthStack';
 
 // Drawer Navigator
 import AppStack from './AppStack';
-
+import AdminStack from './AdminStack';
 // Loading Screen
 import Loading from '../screens/Loading';
 
@@ -20,6 +20,7 @@ const AppNavigator = () => (
       <MainStack.Screen name="Loading" component={Loading} />
       <MainStack.Screen name="Auth" component={AuthStack} />
       <MainStack.Screen name="App" component={AppStack} />
+      <MainStack.Screen name="Admin" component={AdminStack} />
     </MainStack.Navigator>
   </NavigationContainer>
 );

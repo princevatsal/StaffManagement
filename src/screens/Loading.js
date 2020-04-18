@@ -40,7 +40,7 @@ const Loading = ({navigation}) => {
           return null;
         }
         if (userData.isAdmin) {
-          navigation.navigate('App', {screen: 'Admin'});
+          navigation.navigate('Admin', {screen: 'Admin'});
         } else if (userData.credentials.name) {
           setGlobalUser(userData);
           navigation.navigate('App', {screen: 'Home'});

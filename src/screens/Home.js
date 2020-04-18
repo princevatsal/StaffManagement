@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {
   Text,
   View,
@@ -12,15 +12,62 @@ const {width, height} = Dimensions.get('screen');
 import Fire from '../Fire';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import Modal from 'react-native-modal';
-
+import Card from '../components/Card';
 fire = Fire.shared;
 
+// Global User Context
+import {UserContext} from '../context/userContext';
+
+//Formatting Date
+const formatDate = firestoreDate => {
+  console.log(firestoreDate);
+  var jsDate = new Date(firestoreDate._seconds * 1000);
+  var time = jsDate.toLocaleTimeString({}, {hour12: false});
+  time = tConv24(time);
+  console.log(time);
+  return time;
+};
+
+//formatting 12 hours
+function tConv24(time24) {
+  var ts = time24;
+  var H = +ts.substr(0, 2);
+  var h = H % 12 || 12;
+  h = h < 10 ? '0' + h : h; // leading 0 at the left for 1 digit hours
+  var ampm = H < 12 ? ' AM' : ' PM';
+  ts = h + ts.substr(2, 3) + ampm;
+  return ts;
+}
+
+//filter today tasks only
+const filterTask = (tasklist, finaldate) =>
+  tasklist.filter(task => {
+    let today = finaldate.toLocaleDateString();
+    let date = new Date(task.start._seconds * 1000).toLocaleDateString();
+    if (today === date) return true;
+  });
+
 const Home = ({navigation}) => {
+  const todayDate = new Date();
   [model, setmodel] = useState(false);
+  [renderData, setRenderData] = useState([]);
+  [dates, setDates] = useState({date: todayDate, showDate: 'Today'});
+  const {user} = useContext(UserContext);
 
   useEffect(() => {
     // fire.signOutUser();
-  });
+    let tasks = user.tasks;
+    let filteredTasks = filterTask(tasks, dates.date);
+    setRenderData(
+      filteredTasks.map(task => {
+        let StartTime = formatDate(task.start);
+        let EndTime = formatDate(task.end);
+        return {time: StartTime + '--' + EndTime, details: task.details};
+      }),
+    );
+    console.log('time:-');
+  }, [user, dates.date]);
+
   return (
     <View style={styles.container}>
       <View
@@ -92,7 +139,7 @@ const Home = ({navigation}) => {
               }}
             />
             <Text style={{fontSize: 19, color: '#999', marginTop: 4}}>
-              Today
+              {dates.showDate}
             </Text>
           </View>
           <View
@@ -103,11 +150,12 @@ const Home = ({navigation}) => {
               marginRight: 25,
             }}
           />
-          <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
-              onPress={() => {
-                setmodel(!model);
-              }}>
+
+          <TouchableOpacity
+            onPress={() => {
+              setmodel(!model);
+            }}>
+            <View style={{flexDirection: 'row'}}>
               <Image
                 source={require('../assets/imgs/calander2.png')}
                 style={{
@@ -118,39 +166,18 @@ const Home = ({navigation}) => {
                   marginRight: 11,
                 }}
               />
-            </TouchableOpacity>
-            <Text style={{fontSize: 19, color: '#999', marginTop: 4}}>
-              Choose Day
-            </Text>
-          </View>
+              <Text style={{fontSize: 19, color: '#999', marginTop: 4}}>
+                Choose Day
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
         {/* <Icon name="" color="#999" size={40} /> */}
       </View>
       <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <Image
-            source={require('../assets/imgs/todo.png')}
-            style={styles.cardIcon}
-          />
-          <View style={styles.cardText}>
-            <Text style={styles.cardHeading}>9:00 AM -- 1:00 PM</Text>
-            <Text style={styles.cardStr}>
-              Your Work is to fill the data on server
-            </Text>
-          </View>
-        </View>
-        <View style={styles.card}>
-          <Image
-            source={require('../assets/imgs/todo.png')}
-            style={styles.cardIcon}
-          />
-          <View style={styles.cardText}>
-            <Text style={styles.cardHeading}>2:00 PM -- 4:00 PM</Text>
-            <Text style={styles.cardStr}>
-              Your Work is to VERIFY the data on server
-            </Text>
-          </View>
-        </View>
+        {renderData.map(task => (
+          <Card timing={task.time} details={task.details} />
+        ))}
       </View>
 
       <Modal isVisible={model}>
@@ -158,6 +185,11 @@ const Home = ({navigation}) => {
           <Calendar
             onDayPress={day => {
               console.log('selected day', day);
+              let selectedDate = new Date(day.dateString);
+              setDates({
+                date: selectedDate,
+                showDate: selectedDate.toLocaleDateString(),
+              });
               setmodel(!model);
             }}
           />
@@ -172,36 +204,6 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     padding: 30,
-  },
-  card: {
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    shadowColor: '#000',
-    padding: 15,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.32,
-    shadowRadius: 5.46,
-
-    elevation: 9,
-    marginBottom: 20,
-  },
-  cardIcon: {
-    height: 60,
-    width: 60,
-  },
-  cardText: {
-    marginLeft: 15,
-    justifyContent: 'center',
-  },
-  cardHeading: {
-    fontSize: 20,
-  },
-  cardStr: {
-    color: '#999',
-    width: 220,
   },
 });
 
