@@ -66,6 +66,27 @@ class Fire {
         .then(() => resolve());
     });
   };
+
+  getAllUserNames = () => {
+    return new Promise((resolve, reject) => {
+      db.collection('users')
+        .get()
+        .then(data => resolve(data.docs.map(data => data.data())))
+        .catch(err => reject(err));
+    });
+  };
+
+  getUserTask(uid) {
+    return new Promise((resolve, reject) => {
+      db.collection('tasks')
+        .doc(uid)
+        .get()
+        .then(res => {
+          resolve(res.data());
+        })
+        .catch(err => reject(err));
+    });
+  }
 }
 
 Fire.shared = new Fire();

@@ -74,6 +74,7 @@ const UserInfo = ({navigation}) => {
                   credentials: {
                     name: userDetails.name,
                     drivingLicenceNo: userDetails.driving,
+                    uid,
                   },
                   isAdmin: false,
                 })

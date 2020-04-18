@@ -7,36 +7,86 @@ import {
   Image,
   FlatList,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Icon} from 'react-native-elements';
 import {Input} from '../components';
 import {Block} from 'galio-framework';
 import {nowTheme} from '../constants';
+import Fire from '../Fire';
+import Modal from 'react-native-modal';
+import {Calendar} from 'react-native-calendars';
+
+import AddTask from '../components/AddTask';
+import DisplayUser from '../components/DisplayUser';
+//for design purpose
 const {width, height} = Dimensions.get('screen');
-function Item({title}) {
+
+const handleUser = (uid, setTasks, setSelectedUserInfo, title, DlNo) => {
+  console.log(uid);
+  Fire.shared
+    .getUserTask(uid)
+    .then(tasks => {
+      if (tasks) setTasks(tasks.taskList);
+      else setTasks([]);
+      setSelectedUserInfo({name: title, DlNo, uid});
+    })
+    .catch(err => alert('unable to fetch user', err));
+};
+
+//Search List Component
+const Item = ({toPass}) => {
+  const title = toPass.title;
+  const uid = toPass.uid;
+  const setTasks = toPass.setTasks;
+  const setSelectedUserInfo = toPass.setSelectedUserInfo;
+  const DlNo = toPass.DlNo;
+  const Uid = uid;
   return (
     <View style={styles.item}>
-      <Text style={styles.title}>{title}</Text>
+      <Text
+        style={styles.title}
+        onPress={() => {
+          setSearchTerm('');
+          setdata([]);
+          handleUser(Uid, setTasks, setSelectedUserInfo, title, DlNo);
+        }}>
+        {title}
+      </Text>
     </View>
   );
-}
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'Priyansh vatsal',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Ayush kashyap',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Sarthak Gupta',
-  },
-];
+};
+
+//Main Component
 const Admin = ({navigation}) => {
+  const todayDate = new Date();
+
+  //Component States
+  [model, setmodel] = useState(false);
+  [dates, setDates] = useState({date: todayDate, showDate: 'Today'});
   [searchTerm, setSearchTerm] = useState('');
   [data, setdata] = useState([]);
+  [DATA, setDATA] = useState([]);
+  [tasks, setTasks] = useState([]);
+  [selectedUserInfo, setSelectedUserInfo] = useState({
+    name: '',
+    DlNo: '',
+    uid: '',
+  });
+  //fetching user
+  Fire.shared
+    .getAllUserNames()
+    .then(userNames =>
+      setDATA(
+        userNames.map((user, index) => ({
+          title: user.credentials.name,
+          id: index,
+          uid: user.credentials.uid,
+          DlNo: user.credentials.drivingLicenceNo,
+        })),
+      ),
+    )
+    .catch(err => console.log(err));
+  // useEffect(() => {}, [tasks, DATA, dates]);
   return (
     <>
       <View style={styles.container}>
@@ -93,7 +143,18 @@ const Admin = ({navigation}) => {
           </Block>
           <FlatList
             data={data}
-            renderItem={({item}) => <Item title={item.title} />}
+            renderItem={({item}) => (
+              <Item
+                toPass={{
+                  title: item.title,
+                  uid: item.uid,
+                  setTasks,
+                  setdata,
+                  setSelectedUserInfo,
+                  DlNo: item.DlNo,
+                }}
+              />
+            )}
             keyExtractor={item => item.id}
             style={{
               position: 'absolute',
@@ -111,7 +172,7 @@ const Admin = ({navigation}) => {
                 style={styles.iconImg}
               />
               <Text style={{fontSize: 19, color: '#999', marginTop: 4}}>
-                Today
+                {dates.showDate}
               </Text>
             </View>
             <View
@@ -127,18 +188,48 @@ const Admin = ({navigation}) => {
                 onPress={() => {
                   setmodel(!model);
                 }}>
-                <Image
-                  source={require('../assets/imgs/calander2.png')}
-                  style={styles.iconImg}
-                />
+                <View style={{flexDirection: 'row'}}>
+                  <Image
+                    source={require('../assets/imgs/calander2.png')}
+                    style={styles.iconImg}
+                  />
+                  <Text style={{fontSize: 19, color: '#999', marginTop: 4}}>
+                    Choose Day
+                  </Text>
+                </View>
               </TouchableOpacity>
-              <Text style={{fontSize: 19, color: '#999', marginTop: 4}}>
-                Choose Day
-              </Text>
             </View>
           </View>
           {/* <Icon name="" color="#999" size={40} /> */}
         </View>
+        {selectedUserInfo.name ? (
+          <View style={styles.coolContainer}>
+            <Text style={styles.name}>{selectedUserInfo.name}</Text>
+            <View style={styles.textContainer}>
+              <Text>DL No:-</Text>
+              <Text>{selectedUserInfo.DlNo}</Text>
+            </View>
+          </View>
+        ) : (
+          <></>
+        )}
+        <DisplayUser date={dates.date} tasks={tasks} />
+        <AddTask />
+        <Modal isVisible={model}>
+          <View style={{flex: 1}}>
+            <Calendar
+              onDayPress={day => {
+                console.log('selected day', day);
+                let selectedDate = new Date(day.dateString);
+                setDates({
+                  date: selectedDate,
+                  showDate: selectedDate.toLocaleDateString(),
+                });
+                setmodel(!model);
+              }}
+            />
+          </View>
+        </Modal>
       </View>
     </>
   );
@@ -146,6 +237,23 @@ const Admin = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  coolContainer: {
+    paddingTop: 5,
+    paddingLeft: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  name: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: 'red',
+    marginRight: 10,
+  },
+  textContainer: {
+    flexDirection: 'row',
+    padding: 5,
+    justifyContent: 'center',
   },
   inputIcons: {
     marginRight: 12,

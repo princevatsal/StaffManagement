@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -11,6 +11,8 @@ import {Button} from '../components';
 import {Images, nowTheme} from '../constants';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Fire from '../Fire';
+import {UserContext} from '../context/userContext';
+
 const {width, height} = Dimensions.get('screen');
 const ProfilePricture =
   'https://www.biggalyoga.com/wp-content/uploads/2018/07/profilecircle-768x814.png';
@@ -18,6 +20,8 @@ const ProfilePricture =
 const thumbMeasure = (width - 48 - 32) / 2.5;
 
 const Profile = ({navigation}) => {
+  const {unsetGlobalUser} = useContext(UserContext);
+
   [userDetails, setuserDetails] = useState({
     profileurl: ProfilePricture,
     name: 'Priyansh Vatsal',
@@ -162,6 +166,7 @@ const Profile = ({navigation}) => {
                     .signOutUser()
                     .then(() => {
                       console.log('user signed out sucessfully');
+                      unsetGlobalUser();
                     })
                     .catch(err => alert(err.message));
                 }}>

@@ -8,66 +8,38 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-const {width, height} = Dimensions.get('screen');
 import Fire from '../Fire';
-import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
+import {Calendar} from 'react-native-calendars';
 import Modal from 'react-native-modal';
-import Card from '../components/Card';
+import DisplayUser from '../components/DisplayUser';
+
+const {width, height} = Dimensions.get('screen');
 fire = Fire.shared;
 
 // Global User Context
 import {UserContext} from '../context/userContext';
 
-//Formatting Date
-const formatDate = firestoreDate => {
-  console.log(firestoreDate);
-  var jsDate = new Date(firestoreDate._seconds * 1000);
-  var time = jsDate.toLocaleTimeString({}, {hour12: false});
-  time = tConv24(time);
-  console.log(time);
-  return time;
-};
-
-//formatting 12 hours
-function tConv24(time24) {
-  var ts = time24;
-  var H = +ts.substr(0, 2);
-  var h = H % 12 || 12;
-  h = h < 10 ? '0' + h : h; // leading 0 at the left for 1 digit hours
-  var ampm = H < 12 ? ' AM' : ' PM';
-  ts = h + ts.substr(2, 3) + ampm;
-  return ts;
-}
-
-//filter today tasks only
-const filterTask = (tasklist, finaldate) =>
-  tasklist.filter(task => {
-    let today = finaldate.toLocaleDateString();
-    let date = new Date(task.start._seconds * 1000).toLocaleDateString();
-    if (today === date) return true;
-  });
-
+//Main Component
 const Home = ({navigation}) => {
   const todayDate = new Date();
+
+  //defining component states
   [model, setmodel] = useState(false);
-  [renderData, setRenderData] = useState([]);
-  [dates, setDates] = useState({date: todayDate, showDate: 'Today'});
+  [dates, setDates] = useState({date: todayDate, showDate: 'Today2'});
+  [tasks, setTasks] = useState([]);
+  //global state
   const {user} = useContext(UserContext);
 
   useEffect(() => {
-    // fire.signOutUser();
-    let tasks = user.tasks;
-    let filteredTasks = filterTask(tasks, dates.date);
-    setRenderData(
-      filteredTasks.map(task => {
-        let StartTime = formatDate(task.start);
-        let EndTime = formatDate(task.end);
-        return {time: StartTime + '--' + EndTime, details: task.details};
-      }),
-    );
-    console.log('time:-');
-  }, [user, dates.date]);
-
+    console.log('fetching for:-', user.uid);
+    Fire.shared
+      .getUserTask(user.uid)
+      .then(tasks => {
+        if (tasks) setTasks(tasks.taskList);
+        else setTasks([]);
+      })
+      .catch(err => alert('unable to fetch user', err));
+  }, []);
   return (
     <View style={styles.container}>
       <View
@@ -173,18 +145,13 @@ const Home = ({navigation}) => {
           </TouchableOpacity>
         </View>
         {/* <Icon name="" color="#999" size={40} /> */}
-      </View>
-      <View style={styles.cardContainer}>
-        {renderData.map(task => (
-          <Card timing={task.time} details={task.details} />
-        ))}
+        <DisplayUser tasks={tasks} date={dates.date} />
       </View>
 
       <Modal isVisible={model}>
         <View style={{flex: 1}}>
           <Calendar
             onDayPress={day => {
-              console.log('selected day', day);
               let selectedDate = new Date(day.dateString);
               setDates({
                 date: selectedDate,
@@ -201,9 +168,6 @@ const Home = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  cardContainer: {
-    padding: 30,
   },
 });
 
