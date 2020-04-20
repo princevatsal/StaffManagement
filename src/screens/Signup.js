@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import {Block, Text, Button as GaButton, theme} from 'galio-framework';
@@ -27,21 +28,26 @@ const validateEmail = email => {
 };
 
 const Signup = () => {
-  [authDetails, setAuthDetails] = useState({
+  const [authDetails, setAuthDetails] = useState({
     email: '',
     password: '',
     confpassword: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSubmit = () => {
     if (!validateEmail(authDetails.email)) {
+      setIsLoading(false);
       alert('Email is not valid');
       return null;
     }
     if (authDetails.password != authDetails.confpass) {
+      setIsLoading(false);
       alert('Password not match ');
       return null;
     }
     if (authDetails.password.length < 8) {
+      setIsLoading(false);
       alert('Password should be atleast 8 digit long');
       return null;
     }
@@ -49,8 +55,12 @@ const Signup = () => {
       .signUp(authDetails.email, authDetails.password)
       .then(data => {
         console.log('user created');
+        setIsLoading(false);
       })
-      .catch(e => alert(e));
+      .catch(e => {
+        alert(e);
+        setIsLoading(false);
+      });
   };
   return (
     <DismissKeyboard>
@@ -197,13 +207,20 @@ const Signup = () => {
                           color="primary"
                           round
                           style={styles.createButton}
-                          onPress={handleSubmit}>
-                          <Text
-                            style={{fontFamily: 'montserrat-bold'}}
-                            size={14}
-                            color={nowTheme.COLORS.WHITE}>
-                            SignUp
-                          </Text>
+                          onPress={e => {
+                            setIsLoading(true);
+                            handleSubmit(e);
+                          }}>
+                          {isLoading ? (
+                            <ActivityIndicator color="white" />
+                          ) : (
+                            <Text
+                              style={{fontFamily: 'montserrat-bold'}}
+                              size={14}
+                              color={nowTheme.COLORS.WHITE}>
+                              {'Sign In'}
+                            </Text>
+                          )}
                         </Button>
                       </Block>
                     </Block>

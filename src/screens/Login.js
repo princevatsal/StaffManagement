@@ -6,6 +6,7 @@ import {
   StatusBar,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import {
   Block,
@@ -29,27 +30,35 @@ const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
-signInUser = (email, password) => {
-  if (!validateEmail(email)) {
-    alert('Email is not valid');
-    return null;
-  }
-  if (password.length < 8) {
-    alert('Password should be atleast 8 digit long');
-    return null;
-  }
-  fire
-    .signIn(email, password)
-    .then(data => {
-      console.log('user signed');
-    })
-    .catch(e => {
-      alert(e);
-    });
-};
+
 const Login = ({navigation}) => {
-  [email, setEmail] = useState('');
-  [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const signInUser = (email, password) => {
+    if (!validateEmail(email)) {
+      setIsLoading(false);
+      alert('Email is not valid');
+      return null;
+    }
+    if (password.length < 8) {
+      setIsLoading(false);
+      alert('Password should be atleast 8 digit long');
+      return null;
+    }
+    fire
+      .signIn(email, password)
+      .then(data => {
+        console.log('user signed');
+        setIsLoading(false);
+      })
+      .catch(e => {
+        setIsLoading(false);
+        alert(e);
+      });
+  };
+
   return (
     <DismissKeyboard>
       <Block flex middle>
@@ -182,14 +191,19 @@ const Login = ({navigation}) => {
                           round
                           style={styles.createButton}
                           onPress={() => {
+                            setIsLoading(true);
                             signInUser(email, password);
                           }}>
-                          <Text
-                            style={{fontFamily: 'montserrat-bold'}}
-                            size={14}
-                            color={nowTheme.COLORS.WHITE}>
-                            Sign In
-                          </Text>
+                          {isLoading ? (
+                            <ActivityIndicator color="white" />
+                          ) : (
+                            <Text
+                              style={{fontFamily: 'montserrat-bold'}}
+                              size={14}
+                              color={nowTheme.COLORS.WHITE}>
+                              {'Sign In'}
+                            </Text>
+                          )}
                         </Button>
                       </Block>
                     </Block>

@@ -12,7 +12,6 @@ import Fire from '../Fire';
 import {Calendar} from 'react-native-calendars';
 import Modal from 'react-native-modal';
 import DisplayUser from '../components/DisplayUser';
-
 const {width, height} = Dimensions.get('screen');
 fire = Fire.shared;
 
@@ -24,9 +23,9 @@ const Home = ({navigation}) => {
   const todayDate = new Date();
 
   //defining component states
-  [model, setmodel] = useState(false);
-  [dates, setDates] = useState({date: todayDate, showDate: 'Today2'});
-  [tasks, setTasks] = useState([]);
+  const [model, setmodel] = useState(false);
+  const [dates, setDates] = useState({date: todayDate, showDate: 'Today'});
+  const [tasks, setTasks] = useState([]);
   //global state
   const {user} = useContext(UserContext);
 

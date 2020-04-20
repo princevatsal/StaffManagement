@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {Icon} from 'react-native-elements';
@@ -15,9 +16,14 @@ import {nowTheme} from '../constants';
 import Fire from '../Fire';
 import Modal from 'react-native-modal';
 import {Calendar} from 'react-native-calendars';
-
-import AddTask from '../components/AddTask';
+import AddTasks from '../components/tasksClass';
 import DisplayUser from '../components/DisplayUser';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import firestore from '@react-native-firebase/firestore';
+
+//using database
+const db = firestore();
+
 //for design purpose
 const {width, height} = Dimensions.get('screen');
 
@@ -46,8 +52,8 @@ const Item = ({toPass}) => {
       <Text
         style={styles.title}
         onPress={() => {
-          setSearchTerm('');
-          setdata([]);
+          toPass.setSearchTerm('');
+          toPass.setdata([]);
           handleUser(Uid, setTasks, setSelectedUserInfo, title, DlNo);
         }}>
         {title}
@@ -59,19 +65,29 @@ const Item = ({toPass}) => {
 //Main Component
 const Admin = ({navigation}) => {
   const todayDate = new Date();
-
   //Component States
-  [model, setmodel] = useState(false);
-  [dates, setDates] = useState({date: todayDate, showDate: 'Today'});
-  [searchTerm, setSearchTerm] = useState('');
-  [data, setdata] = useState([]);
-  [DATA, setDATA] = useState([]);
-  [tasks, setTasks] = useState([]);
-  [selectedUserInfo, setSelectedUserInfo] = useState({
+  const [model, setmodel] = useState(false);
+  const [dates, setDates] = useState({date: todayDate, showDate: 'Today'});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [data, setdata] = useState([]);
+  const [update, setupdate] = useState(false);
+  const [DATA, setDATA] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [selectedUserInfo, setSelectedUserInfo] = useState({
     name: '',
     DlNo: '',
     uid: '',
   });
+
+  //listning real time update
+  if (update) {
+    console.log('updating');
+    Fire.shared.getUserTask(selectedUserInfo.uid).then(data => {
+      console.log('updated data:-', data);
+      setTasks(data.taskList);
+    });
+    setupdate(false);
+  }
   //fetching user
   Fire.shared
     .getAllUserNames()
@@ -86,7 +102,7 @@ const Admin = ({navigation}) => {
       ),
     )
     .catch(err => console.log(err));
-  // useEffect(() => {}, [tasks, DATA, dates]);
+  useEffect(() => {}, [tasks, DATA, dates]);
   return (
     <>
       <View style={styles.container}>
@@ -152,6 +168,8 @@ const Admin = ({navigation}) => {
                   setdata,
                   setSelectedUserInfo,
                   DlNo: item.DlNo,
+                  setSearchTerm,
+                  setdata,
                 }}
               />
             )}
@@ -213,8 +231,16 @@ const Admin = ({navigation}) => {
         ) : (
           <></>
         )}
-        <DisplayUser date={dates.date} tasks={tasks} />
-        <AddTask />
+        <ScrollView>
+          <DisplayUser date={dates.date} tasks={tasks} />
+        </ScrollView>
+        <AddTasks
+          userInfo={selectedUserInfo}
+          date={dates.date}
+          oldtasks={tasks}
+          setupdate={setupdate}
+        />
+
         <Modal isVisible={model}>
           <View style={{flex: 1}}>
             <Calendar

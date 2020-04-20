@@ -3,6 +3,7 @@ import firestore from '@react-native-firebase/firestore';
 
 //using database
 const db = firestore();
+
 class Fire {
   initializeFirebase = config => {
     firebase.initializeApp(config);
@@ -56,6 +57,7 @@ class Fire {
         .catch(err => reject(err));
     });
   };
+
   writeUserData = (uid, data) => {
     return new Promise((resolve, reject) => {
       db.collection('users')
@@ -84,6 +86,16 @@ class Fire {
         .then(res => {
           resolve(res.data());
         })
+        .catch(err => reject(err));
+    });
+  }
+
+  writeToTasks(uid, tasklist) {
+    return new Promise((resolve, reject) => {
+      db.collection('tasks')
+        .doc(uid)
+        .set({taskList: tasklist})
+        .then(() => resolve())
         .catch(err => reject(err));
     });
   }

@@ -15,18 +15,18 @@ import {UserContext} from '../context/userContext';
 
 const {width, height} = Dimensions.get('screen');
 const ProfilePricture =
-  'https://www.biggalyoga.com/wp-content/uploads/2018/07/profilecircle-768x814.png';
+  'https://www.clipartmax.com/png/middle/171-1717870_stockvader-predicted-cron-for-may-user-profile-icon-png.png';
 
 const thumbMeasure = (width - 48 - 32) / 2.5;
 
 const Profile = ({navigation}) => {
-  const {unsetGlobalUser} = useContext(UserContext);
+  const {user, unsetGlobalUser} = useContext(UserContext);
 
   [userDetails, setuserDetails] = useState({
     profileurl: ProfilePricture,
-    name: 'Priyansh Vatsal',
-    title: 'Employee',
-    about: 'A senior Employee of the company',
+    name: user.credentials.name,
+    title: user.isAdmin ? 'Admin' : 'Employee',
+    about: 'An important part of the company',
   });
   return (
     <Block
@@ -92,7 +92,7 @@ const Profile = ({navigation}) => {
                   </Text>
                 </Block>
                 <Block style={styles.info}>
-                  <Block row space="around">
+                  {/* <Block row space="around">
                     <Block middle>
                       <Text
                         size={18}
@@ -146,7 +146,7 @@ const Profile = ({navigation}) => {
                         Bookmarks
                       </Text>
                     </Block>
-                  </Block>
+                  </Block> */}
                 </Block>
               </Block>
             </Block>
@@ -197,7 +197,7 @@ const Profile = ({navigation}) => {
                 round
                 onlyIcon
                 shadowless
-                icon="pinterest"
+                icon="facebook"
                 iconFamily="Font-Awesome"
                 iconColor={nowTheme.COLORS.WHITE}
                 iconSize={nowTheme.SIZES.BASE * 1.375}
@@ -219,11 +219,11 @@ const Profile = ({navigation}) => {
                   fontWeight: 'bold',
                   fontSize: 19,
                   fontFamily: 'montserrat-bold',
-                  marginTop: 15,
+                  marginTop: 35,
                   marginBottom: 30,
                   zIndex: 2,
                 }}>
-                About me
+                About {user.credentials.name}
               </Text>
               <Text
                 size={16}
