@@ -7,16 +7,19 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  BackHandler,
 } from 'react-native';
 import Fire from '../Fire';
 import {Calendar} from 'react-native-calendars';
 import Modal from 'react-native-modal';
 import DisplayUser from '../components/DisplayUser';
 const {width, height} = Dimensions.get('screen');
+import Toast from 'react-native-simple-toast';
 fire = Fire.shared;
 
 // Global User Context
 import {UserContext} from '../context/userContext';
+var count = 0;
 
 //Main Component
 const Home = ({navigation}) => {
@@ -38,6 +41,18 @@ const Home = ({navigation}) => {
         else setTasks([]);
       })
       .catch(err => alert('unable to fetch user', err));
+    BackHandler.addEventListener('hardwareBackPress', () => {
+      count++;
+      console.log(count);
+      console.log('back button pressed');
+      if (count > 1) {
+        count = 0;
+        console.log('removing listener');
+        BackHandler.removeEventListener('hardwareBackPress', () => {});
+        BackHandler.exitApp();
+      } else Toast.show('Tap again for exit', Toast.SHORT);
+      return true;
+    });
   }, []);
   return (
     <View style={styles.container}>
@@ -169,5 +184,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
 export default Home;

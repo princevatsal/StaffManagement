@@ -7,6 +7,7 @@ import {
   Image,
   FlatList,
   ScrollView,
+  BackHandler,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {Icon} from 'react-native-elements';
@@ -18,7 +19,7 @@ import Modal from 'react-native-modal';
 import {Calendar} from 'react-native-calendars';
 import AddTasks from '../components/tasksClass';
 import DisplayUser from '../components/DisplayUser';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import Toast from 'react-native-simple-toast';
 import firestore from '@react-native-firebase/firestore';
 
 //using database
@@ -26,6 +27,7 @@ const db = firestore();
 
 //for design purpose
 const {width, height} = Dimensions.get('screen');
+var count = 0;
 
 const handleUser = (uid, setTasks, setSelectedUserInfo, title, DlNo) => {
   console.log(uid);
@@ -102,7 +104,19 @@ const Admin = ({navigation}) => {
       ),
     )
     .catch(err => console.log(err));
-  useEffect(() => {}, [tasks, DATA, dates]);
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', () => {
+      count++;
+      console.log(count);
+      if (count > 1) {
+        count = 0;
+        console.log('removing listener');
+        BackHandler.removeEventListener('hardwareBackPress', () => {});
+        BackHandler.exitApp();
+      } else Toast.show('Tap again for exit', Toast.SHORT);
+      return true;
+    });
+  }, []);
   return (
     <>
       <View style={styles.container}>
