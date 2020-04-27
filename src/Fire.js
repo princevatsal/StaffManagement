@@ -99,6 +99,38 @@ class Fire {
         .catch(err => reject(err));
     });
   }
+  updateUserActivity = (uid, timestamp, geo) => {
+    return new Promise((resolve, reject) => {
+      console.log('info from fire :-', uid, timestamp, geo);
+      db.collection(`user-activity`)
+        .doc(uid)
+        .set({[timestamp]: {geo}}, {merge: true})
+        .then(() => resolve())
+        .catch(err => reject(err));
+    });
+  };
+  updateDanger = uid => {
+    return new Promise((resolve, reject) => {
+      db.collection('security-status')
+        .doc(uid)
+        .set({allOk: false})
+        .then(() => resolve())
+        .catch(err => reject(err));
+    });
+  };
+
+  getUserActivity = uid => {
+    return new Promise((resolve, reject) => {
+      db.collection('user-activity')
+        .doc(uid)
+        .get()
+        .then(data => {
+          resolve(data.data());
+          console.log(data.data());
+        })
+        .catch(err => reject(err));
+    });
+  };
 }
 
 Fire.shared = new Fire();

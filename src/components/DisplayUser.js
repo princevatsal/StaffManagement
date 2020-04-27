@@ -1,5 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  DatePickerIOS,
+  Text,
+} from 'react-native';
 import Card from './Card';
 
 const {width, height} = Dimensions.get('screen');
@@ -53,9 +60,13 @@ const DisplayUser = ({tasks, date}) => {
 
   return (
     <View style={styles.cardContainer}>
-      {renderData.map(task => (
-        <Card timing={task.time} details={task.details} />
-      ))}
+      {renderData.length ? (
+        renderData.map((task, index) => (
+          <Card timing={task.time} details={task.details} key={index} />
+        ))
+      ) : (
+        <Text style={{alignSelf: 'center', fontSize: 18}}>No Tasks Yet</Text>
+      )}
     </View>
   );
 };
@@ -63,7 +74,6 @@ const DisplayUser = ({tasks, date}) => {
 const styles = StyleSheet.create({
   cardContainer: {
     padding: 30,
-    paddingTop: 10,
   },
   container: {
     padding: 10,

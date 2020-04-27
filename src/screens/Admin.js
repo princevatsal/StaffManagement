@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
   BackHandler,
+  Linking,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {Icon} from 'react-native-elements';
@@ -21,7 +22,9 @@ import AddTasks from '../components/tasksClass';
 import DisplayUser from '../components/DisplayUser';
 import Toast from 'react-native-simple-toast';
 import firestore from '@react-native-firebase/firestore';
-
+import RootCard from '../components/RootCard';
+import LocationCard from '../components/LocationCard';
+var PushNotification = require('react-native-push-notification');
 //using database
 const db = firestore();
 
@@ -36,7 +39,21 @@ const handleUser = (uid, setTasks, setSelectedUserInfo, title, DlNo) => {
     .then(tasks => {
       if (tasks) setTasks(tasks.taskList);
       else setTasks([]);
-      setSelectedUserInfo({name: title, DlNo, uid});
+      setSelectedUserInfo({name: title, DlNo, uid, userActivity: []});
+      Fire.shared
+        .getUserActivity(uid)
+        .then(data => {
+          var arr = [];
+          Object.keys(data).forEach(item => {
+            let it = data[item];
+            let date = new Date(Number(item));
+            it.time = date.toLocaleString();
+            arr.push(it);
+          });
+          setSelectedUserInfo({name: title, DlNo, uid, userActivity: arr});
+          console.log('activity setted sucessfully:-', arr);
+        })
+        .catch(err => console.log(err));
     })
     .catch(err => alert('unable to fetch user', err));
 };
@@ -79,8 +96,10 @@ const Admin = ({navigation}) => {
     name: '',
     DlNo: '',
     uid: '',
+    userActivity: [],
   });
-
+  const [showTasks, setShowTasks] = useState(false);
+  const [showLocation, setShowLocation] = useState(false);
   //listning real time update
   if (update) {
     console.log('updating');
@@ -105,6 +124,7 @@ const Admin = ({navigation}) => {
     )
     .catch(err => console.log(err));
   useEffect(() => {
+    PushNotification.cancelAllLocalNotifications();
     BackHandler.addEventListener('hardwareBackPress', () => {
       count++;
       console.log(count);
@@ -245,17 +265,79 @@ const Admin = ({navigation}) => {
         ) : (
           <></>
         )}
-        <ScrollView>
-          <DisplayUser date={dates.date} tasks={tasks} />
-        </ScrollView>
-        <AddTasks
-          userInfo={selectedUserInfo}
-          date={dates.date}
-          oldtasks={tasks}
-          setupdate={setupdate}
-        />
 
-        <Modal isVisible={model}>
+        {selectedUserInfo.name ? (
+          <>
+            {showTasks || showLocation ? (
+              <>
+                {showTasks ? (
+                  <>
+                    <TouchableOpacity
+                      onPress={() => setShowTasks(false)}
+                      style={{marginLeft: 20, marginTop: -25}}>
+                      <Image
+                        source={require('../assets/imgs/back.png')}
+                        style={styles.back}
+                      />
+                    </TouchableOpacity>
+                    <ScrollView style={{height: 400}}>
+                      <DisplayUser date={dates.date} tasks={tasks} />
+                    </ScrollView>
+                    <AddTasks
+                      userInfo={selectedUserInfo}
+                      date={dates.date}
+                      oldtasks={tasks}
+                      setupdate={setupdate}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      onPress={() => setShowLocation(false)}
+                      style={{marginLeft: 20, marginTop: -25}}>
+                      <Image
+                        source={require('../assets/imgs/back.png')}
+                        style={styles.back}
+                      />
+                    </TouchableOpacity>
+                    <View style={styles.locationContainer}>
+                      {selectedUserInfo.userActivity.map(activity => (
+                        <TouchableOpacity
+                          onPress={() => {
+                            Linking.openURL(
+                              `https://www.google.com/maps/place/${
+                                activity.geo.lat
+                              },${activity.geo.long}`,
+                            );
+                          }}>
+                          <LocationCard
+                            time={activity.time}
+                            details={`Lat: ${activity.geo.lat}\nLong: ${
+                              activity.geo.long
+                            }`}
+                          />
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </>
+                )}
+              </>
+            ) : (
+              <View style={{marginTop: 20}}>
+                <TouchableOpacity onPress={() => setShowTasks(true)}>
+                  <RootCard heading="See User Tasks" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowLocation(true)}>
+                  <RootCard heading="See User Locations" />
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
+        ) : (
+          <></>
+        )}
+
+        <Modal isVisible={model} onBackButtonPress={() => setmodel(!model)}>
           <View style={{flex: 1}}>
             <Calendar
               onDayPress={day => {
@@ -375,6 +457,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
+  },
+  back: {
+    height: 35,
+    width: 35,
+  },
+  locationContainer: {
+    margin: 20,
   },
 });
 export default Admin;

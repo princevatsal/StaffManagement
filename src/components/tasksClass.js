@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  BackHandler,
   TextInput,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -38,6 +37,9 @@ class App extends Component {
     super(props);
     this.state = initialState;
   }
+  handleDetailChange = e => {
+    this.setState({aboutTask: e});
+  };
   addTask = () => {
     let aboutTask = this.state.aboutTask;
     let start = this.state.dateDetails.start;
@@ -139,7 +141,10 @@ class App extends Component {
             </GButton>
           </TouchableOpacity>
         )}
-        <Modal isVisible={this.state.showModel} style={styles.model}>
+        <Modal
+          isVisible={this.state.showModel}
+          style={styles.model}
+          onBackButtonPress={() => this.setState(initialState)}>
           <View style={styles.viewContainer}>
             <View style={{flexDirection: 'row'}}>
               <View style={[styles.textContainer, {marginRight: 35}]}>
@@ -186,7 +191,8 @@ class App extends Component {
               placeholderTextColor="#9999"
               textAlign="center"
               value={this.state.aboutTask}
-              onChangeText={e => this.setState({aboutTask: e})}
+              onChangeText={this.handleDetailChange}
+              onBlur={() => this.setState(initialState)}
             />
             <View style={styles.bottom}>
               <TouchableOpacity

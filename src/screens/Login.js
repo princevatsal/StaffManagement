@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  PermissionsAndroid,
 } from 'react-native';
 import {
   Block,
@@ -19,6 +20,9 @@ import {Button, Input} from '../components';
 import {Images, nowTheme} from '../constants';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Fire from '../Fire';
+import Geolocation from 'react-native-geolocation-service';
+import AndroidOpenSettings from 'react-native-android-open-settings';
+
 const fire = Fire.shared;
 const {width, height} = Dimensions.get('screen');
 const DismissKeyboard = ({children}) => (
@@ -30,11 +34,76 @@ const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
+const requestLocationPermission = async setLocation => {
+  try {
+    const grantedLocation = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Location Permission Required',
+        message: 'Allow Permission for login  ',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    // alert('Please Grant Floating Notification Permission ');
+    // AndroidOpenSettings.appNotificationSettings();
+    // const grantedWave = await PermissionsAndroid.request(
+    //   PermissionsAndroid.PERMISSIONS.RECEIVE_WAP_PUSH,
+    //   {
+    //     title: 'Notification Permission Required',
+    //     message: 'Allow Permission for login  ',
+    //     buttonNeutral: 'Ask Me Later',
+    //     buttonNegative: 'Cancel',
+    //     buttonPositive: 'OK',
+    //   },
+    // );
+    if (grantedLocation === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('You can use the location');
+      Geolocation.getCurrentPosition(
+        position => {
+          console.log(position);
+          setLocation({
+            timestamp: position.timestamp,
+            geo: {
+              lat: position.coords.latitude,
+              long: position.coords.longitude,
+            },
+          });
+        },
+        error => {
+          // See error code charts below.
+          console.log(error.code, error.message);
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
+    } else {
+      console.log('Location permission denied');
+    }
+
+    // if (grantedWave === PermissionsAndroid.RESULTS.GRANTED) {
+    //   console.log('Wake Up permission Granted');
+
+    // } else {
+    //   console.log('Wake Up Permission denied');
+    // }
+  } catch (err) {
+    console.warn(err);
+  }
+};
 
 const Login = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [location, setLocation] = useState({
+    timestamp: null,
+    geo: null,
+  });
+  //requesting permission
+  useEffect(() => {
+    requestLocationPermission(setLocation);
+  }, []);
 
   const signInUser = (email, password) => {
     if (!validateEmail(email)) {
@@ -50,7 +119,11 @@ const Login = ({navigation}) => {
     fire
       .signIn(email, password)
       .then(data => {
-        console.log('user signed');
+        console.log('user signed:-', data);
+        Fire.shared
+          .updateUserActivity(data.user.uid, location.timestamp, location.geo)
+          .then(() => console.log('location updatd'))
+          .catch(err => console.log(err));
         setIsLoading(false);
       })
       .catch(e => {

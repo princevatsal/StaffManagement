@@ -18,6 +18,7 @@ import Fire from '../Fire';
 const DrawerContent = props => {
   const {user, unsetGlobalUser} = useContext(UserContext);
   const [isAdmin, setIsAdmin] = useState(false);
+  const size = 20;
   console.log('user:-', user);
   const [isDarkTheme, setIsDarkTheme] = React.useState(false);
   2;
@@ -66,18 +67,25 @@ const DrawerContent = props => {
 
           <Drawer.Section style={styles.drawerSection}>
             {!isAdmin ? (
-              <DrawerItem
-                icon={(color, size) => (
-                  <Icon name="home-outline" color={color} size={size} />
-                )}
-                label="Home"
-                onPress={() =>
-                  props.navigation.navigate('App', {screen: 'Home'})
-                }
-              />
+              <>
+                <DrawerItem
+                  icon={color => (
+                    <Icon name="home-outline" color={color} size={size} />
+                  )}
+                  label="Home"
+                  onPress={() =>
+                    props.navigation.navigate('App', {screen: 'Home'})
+                  }
+                />
+                <DrawerItem
+                  icon={color => <Icon name="lock" color={color} size={size} />}
+                  label="Security Status"
+                  onPress={() => props.navigation.navigate('SecurityStatus')}
+                />
+              </>
             ) : (
               <DrawerItem
-                icon={(color, size) => (
+                icon={color => (
                   <Icon name="settings-outline" color={color} size={size} />
                 )}
                 label="Admin"
@@ -85,7 +93,7 @@ const DrawerContent = props => {
               />
             )}
             <DrawerItem
-              icon={(color, size) => (
+              icon={color => (
                 <Icon name="account-outline" color={color} size={size} />
               )}
               label="Profile"
@@ -106,7 +114,7 @@ const DrawerContent = props => {
               onPress={() => props.navigation.navigate('Settings')}
             /> */}
             <DrawerItem
-              icon={(color, size) => (
+              icon={color => (
                 <Icon name="account-check-outline" color={color} size={size} />
               )}
               label="Support"
@@ -129,9 +137,7 @@ const DrawerContent = props => {
 
       <Drawer.Section style={styles.drawerSection}>
         <DrawerItem
-          icon={(color, size) => (
-            <Icon name="exit-to-app" color={color} size={size} />
-          )}
+          icon={color => <Icon name="exit-to-app" color={color} size={size} />}
           label="Sign Out"
           onPress={() => {
             Fire.shared

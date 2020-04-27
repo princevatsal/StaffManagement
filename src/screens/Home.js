@@ -3,26 +3,97 @@ import {
   Text,
   View,
   StyleSheet,
-  Button,
   Dimensions,
   TouchableOpacity,
   Image,
   BackHandler,
+  ScrollView,
+  DeviceEventEmitter,
 } from 'react-native';
 import Fire from '../Fire';
 import {Calendar} from 'react-native-calendars';
 import Modal from 'react-native-modal';
 import DisplayUser from '../components/DisplayUser';
-const {width, height} = Dimensions.get('screen');
 import Toast from 'react-native-simple-toast';
-fire = Fire.shared;
+var PushNotification = require('react-native-push-notification');
+const {width, height} = Dimensions.get('screen');
 
 // Global User Context
 import {UserContext} from '../context/userContext';
 var count = 0;
 
+//Yes Notification Hnalder
+const YesNotification = navigation => {
+  console.log('Yes came open the app');
+  navigation.navigate('SecurityStatus');
+};
+
+//filter today by given Date
+const filterTask = (tasklist, finaldate) =>
+  tasklist.filter(task => {
+    let today = finaldate.toLocaleDateString();
+    let date = new Date(task.start._seconds * 1000).toLocaleDateString();
+    if (today === date) return true;
+  });
+
+//applying Notification
+applyNotifications = tasks => {
+  const filteredTasks = filterTask(tasks, new Date());
+  var dates = [];
+  var now = new Date();
+  filteredTasks.forEach(task => {
+    task.start = new Date(task.start._seconds * 1000);
+    task.end = new Date(task.end._seconds * 1000);
+    let datestoadd = [];
+    let flag = true;
+    let hrs = 1;
+    while (flag) {
+      let date = task.start.getTime() + hrs * 1000 * 60 * 60;
+      hrs++;
+      if (date < task.end) {
+        if (date > now) dates.push(new Date(date));
+      } else flag = false;
+    }
+  });
+  setNotifications(dates);
+};
+
+setNotifications = dates => {
+  //creating notification
+  PushNotification.cancelAllLocalNotifications();
+  dates.forEach((date, index) => {
+    PushNotification.localNotificationSchedule({
+      /* iOS and Android properties */
+      id: index,
+      title: 'Security Status', // (optional)
+      message: 'Is there any Problem with Security', // (required)
+      actions: '["Yes"]',
+      date: date, // provided date
+    });
+  });
+};
+
 //Main Component
 const Home = ({navigation}) => {
+  //push notofications
+  PushNotification.configure({
+    onRegister: function(token) {
+      console.log('TOKEN:', token);
+    },
+    onNotification: function(notification) {
+      console.log('NOTIFICATION:', notification);
+      if (notification.action == 'Yes') YesNotification(navigation);
+    },
+    permissions: {
+      alert: true,
+      badge: true,
+      sound: true,
+    },
+    popInitialNotification: false,
+    requestPermissions: true,
+  });
+
+  //
   const todayDate = new Date();
 
   //defining component states
@@ -37,22 +108,12 @@ const Home = ({navigation}) => {
     Fire.shared
       .getUserTask(user.uid)
       .then(tasks => {
-        if (tasks) setTasks(tasks.taskList);
-        else setTasks([]);
+        if (tasks) {
+          setTasks(tasks.taskList);
+          applyNotifications(tasks.taskList);
+        } else setTasks([]);
       })
       .catch(err => alert('unable to fetch user', err));
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      count++;
-      console.log(count);
-      console.log('back button pressed');
-      if (count > 1) {
-        count = 0;
-        console.log('removing listener');
-        BackHandler.removeEventListener('hardwareBackPress', () => {});
-        BackHandler.exitApp();
-      } else Toast.show('Tap again for exit', Toast.SHORT);
-      return true;
-    });
   }, []);
   return (
     <View style={styles.container}>
@@ -158,11 +219,11 @@ const Home = ({navigation}) => {
             </View>
           </TouchableOpacity>
         </View>
-        {/* <Icon name="" color="#999" size={40} /> */}
-        <DisplayUser tasks={tasks} date={dates.date} />
       </View>
-
-      <Modal isVisible={model}>
+      <ScrollView>
+        <DisplayUser date={dates.date} tasks={tasks} />
+      </ScrollView>
+      <Modal isVisible={model} onBackButtonPress={() => setmodel(!model)}>
         <View style={{flex: 1}}>
           <Calendar
             onDayPress={day => {
