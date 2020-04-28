@@ -1,5 +1,6 @@
 import firebase from 'firebase';
 import firestore from '@react-native-firebase/firestore';
+import {List} from 'react-native-paper';
 
 //using database
 const db = firestore();
@@ -127,6 +128,25 @@ class Fire {
         .then(data => {
           resolve(data.data());
           console.log(data.data());
+        })
+        .catch(err => reject(err));
+    });
+  };
+  uidReportedDanger = () => {
+    return new Promise((resolve, reject) => {
+      db.collection('security-status')
+        .get()
+        .then(list => {
+          console.log('requesting');
+          let cool = list._docs.map(item => {
+            let obj = item.data();
+            obj.uid = item.id;
+            return obj;
+          });
+          let finaluidlist = cool
+            .filter(item => (item.allOk ? false : true))
+            .map(item => item.uid);
+          resolve(finaluidlist);
         })
         .catch(err => reject(err));
     });

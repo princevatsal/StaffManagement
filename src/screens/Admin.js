@@ -100,6 +100,9 @@ const Admin = ({navigation}) => {
   });
   const [showTasks, setShowTasks] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
+  const [allOk, setAllOk] = useState(true);
+  const [statusModel, setStatusModel] = useState(false);
+  const [uidReported, setUidReported] = useState([]);
   //listning real time update
   if (update) {
     console.log('updating');
@@ -109,20 +112,7 @@ const Admin = ({navigation}) => {
     });
     setupdate(false);
   }
-  //fetching user
-  Fire.shared
-    .getAllUserNames()
-    .then(userNames =>
-      setDATA(
-        userNames.map((user, index) => ({
-          title: user.credentials.name,
-          id: index,
-          uid: user.credentials.uid,
-          DlNo: user.credentials.drivingLicenceNo,
-        })),
-      ),
-    )
-    .catch(err => console.log(err));
+
   useEffect(() => {
     PushNotification.cancelAllLocalNotifications();
     BackHandler.addEventListener('hardwareBackPress', () => {
@@ -136,23 +126,97 @@ const Admin = ({navigation}) => {
       } else Toast.show('Tap again for exit', Toast.SHORT);
       return true;
     });
+    //fetching user
+    Fire.shared
+      .getAllUserNames()
+      .then(userNames => {
+        let dat = userNames.map((user, index) => ({
+          title: user.credentials.name,
+          id: index,
+          uid: user.credentials.uid,
+          DlNo: user.credentials.drivingLicenceNo,
+        }));
+        setDATA(dat);
+        //fetching security status
+        Fire.shared
+          .uidReportedDanger()
+          .then(uids => {
+            if (uids.length) {
+              setAllOk(false);
+              // console.log('uid fetched :- ', uids);
+              setUidReported(
+                dat.filter(user => (uids.includes(user.uid) ? true : false)),
+              );
+            }
+          })
+          .catch(() => console.log('unable to fetch uid reported danger '));
+      })
+      .catch(err => console.log(err));
   }, []);
   return (
     <>
       <View style={styles.container}>
         <View style={styles.Header}>
           <View style={styles.navigation}>
-            <TouchableOpacity
-              onPress={() => {
-                console.log('pressed');
-                navigation.toggleDrawer();
-              }}>
+            <View style={{flexDirection: 'row'}}>
+              <TouchableOpacity
+                onPress={() => {
+                  console.log('pressed');
+                  navigation.toggleDrawer();
+                }}>
+                <Image
+                  source={require('../assets/imgs/menu.png')}
+                  style={{width: 35, height: 35, marginRight: 20}}
+                />
+              </TouchableOpacity>
+              <Text style={styles.brand}>Tasks</Text>
+            </View>
+            {allOk ? (
               <Image
-                source={require('../assets/imgs/menu.png')}
-                style={{width: 35, height: 35, marginRight: 20}}
+                source={require('../assets/imgs/tick.png')}
+                style={styles.statusIcon}
               />
-            </TouchableOpacity>
-            <Text style={styles.brand}>Tasks</Text>
+            ) : (
+              <>
+                <TouchableOpacity onPress={() => setStatusModel(true)}>
+                  <Image
+                    source={require('../assets/imgs/danger.png')}
+                    style={styles.statusIcon}
+                  />
+                </TouchableOpacity>
+                <Modal
+                  isVisible={statusModel}
+                  onBackButtonPress={() => setStatusModel(!statusModel)}>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                    }}>
+                    <View
+                      style={{
+                        backgroundColor: '#fff',
+                        borderRadius: 10,
+                        padding: 20,
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 21,
+                          textAlign: 'center',
+                          marginBottom: 20,
+                        }}>
+                        User that have reported{' '}
+                      </Text>
+                      {uidReported.map((user, index) => (
+                        <RootCard
+                          key={index}
+                          heading={`Name:- ${user.title} DlNo:-${user.DlNo}`}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                </Modal>
+              </>
+            )}
           </View>
           <Block
             width={width}
@@ -405,8 +469,9 @@ const styles = StyleSheet.create({
   navigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: 0.32 * width,
+    width: width,
     paddingLeft: 20,
+    paddingRight: 35,
     backgroundColor: 'white',
   },
   tabs: {
@@ -464,6 +529,10 @@ const styles = StyleSheet.create({
   },
   locationContainer: {
     margin: 20,
+  },
+  statusIcon: {
+    height: 30,
+    width: 30,
   },
 });
 export default Admin;
