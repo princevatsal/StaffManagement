@@ -222,7 +222,7 @@ const Login = ({navigation}) => {
                             iconContent={
                               <Icon
                                 size={23}
-                                color="#00aced"
+                                color="orange"
                                 name="account-circle"
                                 family="NowExtra"
                                 style={styles.inputIcons}
@@ -240,7 +240,12 @@ const Login = ({navigation}) => {
                             value={password}
                             style={styles.inputs}
                             iconContent={
-                              <Icon size={23} name="lock" color="#00aced" />
+                              <Icon
+                                size={23}
+                                name="lock"
+                                color="orange"
+                                style={styles.inputIcons}
+                              />
                             }
                           />
                         </Block>
@@ -254,7 +259,7 @@ const Login = ({navigation}) => {
                           color: '#00aced',
                           fontWeight: 'bold',
                           fontSize: 16,
-                          textDecorationLine: 'underline',
+                          //change
                         }}>
                         Don't have a account SignUp
                       </Text>
@@ -343,7 +348,7 @@ const styles = StyleSheet.create({
   },
   inputIcons: {
     marginRight: 12,
-    color: nowTheme.COLORS.ICON_INPUT,
+    color: '#f96332',
   },
   inputs: {
     borderWidth: 1,

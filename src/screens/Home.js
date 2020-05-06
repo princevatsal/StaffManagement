@@ -37,31 +37,31 @@ const filterTask = (tasklist, finaldate) =>
   });
 
 //applying Notification
-applyNotifications = tasks => {
-  const filteredTasks = filterTask(tasks, new Date());
-  var dates = [];
+applyNotifications = taskss => {
+  const filteredTaskss = filterTask(taskss, new Date());
+  var datess = [];
   var now = new Date();
-  filteredTasks.forEach(task => {
-    task.start = new Date(task.start._seconds * 1000);
-    task.end = new Date(task.end._seconds * 1000);
-    let datestoadd = [];
+  filteredTaskss.forEach(task => {
+    let temp_start = new Date(task.start._seconds * 1000);
+    let temp_end = new Date(task.end._seconds * 1000);
     let flag = true;
     let hrs = 1;
     while (flag) {
-      let date = task.start.getTime() + hrs * 1000 * 60 * 60;
+      let date = temp_start.getTime() + hrs * 1000 * 60 * 60;
       hrs++;
-      if (date < task.end) {
-        if (date > now) dates.push(new Date(date));
+      if (date < temp_end) {
+        if (date > now) datess.push(new Date(date));
       } else flag = false;
     }
   });
-  setNotifications(dates);
+  setNotifications(datess);
 };
 
 setNotifications = dates => {
   //creating notification
   PushNotification.cancelAllLocalNotifications();
   dates.forEach((date, index) => {
+    console.log('Setting notification :-', date.toLocaleString());
     PushNotification.localNotificationSchedule({
       /* iOS and Android properties */
       id: index,

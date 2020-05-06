@@ -23,6 +23,7 @@ import DisplayUser from '../components/DisplayUser';
 import Toast from 'react-native-simple-toast';
 import firestore from '@react-native-firebase/firestore';
 import RootCard from '../components/RootCard';
+import RootCard2 from '../components/RootCard2';
 import LocationCard from '../components/LocationCard';
 var PushNotification = require('react-native-push-notification');
 //using database
@@ -207,8 +208,12 @@ const Admin = ({navigation}) => {
                         User that have reported{' '}
                       </Text>
                       {uidReported.map((user, index) => (
-                        <RootCard
+                        <RootCard2
                           key={index}
+                          uid={user.uid}
+                          setUidReported={setUidReported}
+                          uidReported={uidReported}
+                          setAllOk={setAllOk}
                           heading={`Name:- ${user.title} DlNo:-${user.DlNo}`}
                         />
                       ))}
@@ -364,7 +369,7 @@ const Admin = ({navigation}) => {
                         style={styles.back}
                       />
                     </TouchableOpacity>
-                    <View style={styles.locationContainer}>
+                    <ScrollView style={styles.locationContainer}>
                       {selectedUserInfo.userActivity.map(activity => (
                         <TouchableOpacity
                           onPress={() => {
@@ -382,7 +387,7 @@ const Admin = ({navigation}) => {
                           />
                         </TouchableOpacity>
                       ))}
-                    </View>
+                    </ScrollView>
                   </>
                 )}
               </>

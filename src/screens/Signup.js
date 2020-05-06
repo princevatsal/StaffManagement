@@ -218,7 +218,7 @@ const Signup = () => {
                               style={{fontFamily: 'montserrat-bold'}}
                               size={14}
                               color={nowTheme.COLORS.WHITE}>
-                              {'Sign In'}
+                              {'Sign Up'}
                             </Text>
                           )}
                         </Button>

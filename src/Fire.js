@@ -1,7 +1,5 @@
 import firebase from 'firebase';
 import firestore from '@react-native-firebase/firestore';
-import {List} from 'react-native-paper';
-
 //using database
 const db = firestore();
 
@@ -102,7 +100,6 @@ class Fire {
   }
   updateUserActivity = (uid, timestamp, geo) => {
     return new Promise((resolve, reject) => {
-      console.log('info from fire :-', uid, timestamp, geo);
       db.collection(`user-activity`)
         .doc(uid)
         .set({[timestamp]: {geo}}, {merge: true})
@@ -119,6 +116,15 @@ class Fire {
         .catch(err => reject(err));
     });
   };
+  updateSafe = uid => {
+    return new Promise((resolve, reject) => {
+      db.collection('security-status')
+        .doc(uid)
+        .set({allOk: true})
+        .then(() => resolve())
+        .catch(err => reject(err));
+    });
+  };
 
   getUserActivity = uid => {
     return new Promise((resolve, reject) => {
@@ -127,7 +133,6 @@ class Fire {
         .get()
         .then(data => {
           resolve(data.data());
-          console.log(data.data());
         })
         .catch(err => reject(err));
     });
@@ -137,7 +142,6 @@ class Fire {
       db.collection('security-status')
         .get()
         .then(list => {
-          console.log('requesting');
           let cool = list._docs.map(item => {
             let obj = item.data();
             obj.uid = item.id;
